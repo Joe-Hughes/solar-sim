@@ -16,14 +16,15 @@ namespace ProjectRevolution
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D Texture;
+        Texture2D planet;
+        Texture2D star;
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
         Vector2 initialPos;
         Vector2 dragVector;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
-        int spriteCacheSize = 1400;
+        int spriteCacheSize = 700;
 
         public Game1()
         {
@@ -45,9 +46,23 @@ namespace ProjectRevolution
             // TODO: Add your initialization logic here
             this.IsMouseVisible = true;
 
-            Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", Texture);
-            Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", Texture, sun, new Vector2(20000, 0));
-            Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", Texture, sun, new Vector2(-20000, 0));
+            base.Initialize();
+        }
+
+        /// <summary>
+        /// LoadContent will be called once per game and is the place to load
+        /// all of your content.
+        /// </summary>
+        protected override void LoadContent()
+        {
+            // Create a new SpriteBatch, which can be used to draw textures.
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            planet = this.Content.Load<Texture2D>(@"CIRCLE");
+            star = this.Content.Load<Texture2D>(@"STAR");
+
+            Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", star);
+            Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planet, sun, new Vector2(20000, 0));
+            Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planet, sun, new Vector2(-20000, 0));
 
             bodies.Add(sun);
             bodies.Add(earth);
@@ -63,18 +78,6 @@ namespace ProjectRevolution
                 }
             }
 
-            base.Initialize();
-        }
-
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
-        protected override void LoadContent()
-        {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            Texture = this.Content.Load<Texture2D>(@"CIRCLE");
         }
 
         /// <summary>
@@ -113,7 +116,7 @@ namespace ProjectRevolution
                 initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
                 initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
 
-                Planet rngObject = new Planet(5.93 * Math.Pow(10, 25), 8, graphics.GraphicsDevice, initialPos, bodies.Count.ToString(), Texture, bodies[0], shootVector);
+                Planet rngObject = new Planet(5.93 * Math.Pow(10, 25), 8, graphics.GraphicsDevice, initialPos, bodies.Count.ToString(), planet, bodies[0], shootVector);
                 bodies.Add(rngObject);
                 planets.Add(rngObject);
                 spriteCache.Add(rngObject, new List<Vector2>());
@@ -138,7 +141,7 @@ namespace ProjectRevolution
             spriteBatch.Begin();
             foreach (Body body in bodies)
             {
-                spriteBatch.Draw(Texture, body.Position);
+                spriteBatch.Draw(body.Texture, body.Position);
                 if (!body.IsStar)
                 {
                     Planet planet = body as Planet;
@@ -147,10 +150,10 @@ namespace ProjectRevolution
                     {
                         spriteCache[planet].RemoveAt(0);
                     }
-                    //foreach (Vector2 position in spriteCache[planet])
-                    //{
-                    //    spriteBatch.Draw(Texture, position);
-                    //}
+                    foreach (Vector2 position in spriteCache[planet])
+                    {
+                        spriteBatch.Draw(body.Texture, position);
+                    }
                 }
 
             }
