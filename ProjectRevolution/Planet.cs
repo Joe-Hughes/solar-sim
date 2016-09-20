@@ -26,9 +26,11 @@ namespace ProjectRevolution
             this.velocity.Y = Convert.ToSingle((initialVelocity.Y / scaleMultiplier) * timeSpeed);
             this.distance = DetermineDistance(star);
 
-            double posX = GetCenter(graphicsDevice).X + (positionOffset.X);
-            double posY = GetCenter(graphicsDevice).Y + (positionOffset.Y);
+            double posX = GetCenter(graphicsDevice).X - radius + (positionOffset.X);
+            double posY = GetCenter(graphicsDevice).Y - radius + (positionOffset.Y);
             this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
+            
+            
         }
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position

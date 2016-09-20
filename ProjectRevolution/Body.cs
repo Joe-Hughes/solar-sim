@@ -23,7 +23,7 @@ namespace ProjectRevolution
         // Newtons konstant, gäller för alla kroppar med massa
         // enhet: Nm^2/kg^2
         protected double scaleMultiplier = 1.06857 * Math.Pow(10, 9); // TODO: generera i kod istället för att använda ett arbiträrt nummer
-        protected double timeSpeed = 7200; // TODO använd variable time step istället för fixed
+        protected double timeSpeed = 14000; // TODO använd variable time step istället för fixed
 
         protected double gravConstant = 6.67408 * Math.Pow(10, -11);
 
@@ -43,7 +43,8 @@ namespace ProjectRevolution
             this.texture = texture;
 
             // Sätter stjärnan i mitten av skärmen genom att ta skärmstorleken och dela på två
-            this.position = GetCenter(graphicsDevice);
+            this.position.X = Convert.ToSingle(GetCenter(graphicsDevice).X - radius);
+            this.position.Y = Convert.ToSingle(GetCenter(graphicsDevice).Y - radius);
         }
 
         // returnerar distansen mellan denna och en annan kropp genom Pytagoras sats
@@ -66,13 +67,10 @@ namespace ProjectRevolution
             return hypotenuse;
         }
 
-        protected Vector2 GetCenter(GraphicsDevice graphicsDevice)
+        public static Vector2 GetCenter(GraphicsDevice graphicsDevice)
         {
             Point window = graphicsDevice.PresentationParameters.Bounds.Center;
             Vector2 center = window.ToVector2();
-
-            center.X -= Convert.ToSingle(this.radius);
-            center.Y -= Convert.ToSingle(this.radius);
 
             return center;
         }
