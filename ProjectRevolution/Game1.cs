@@ -16,15 +16,17 @@ namespace ProjectRevolution
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D planet;
-        Texture2D star;
+        Texture2D planetSprite;
+        Texture2D starSprite;
+        Texture2D tailSprite;
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
         Vector2 initialPos;
         Vector2 dragVector;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
-        int spriteCacheSize = 700;
+        int spriteCacheSize = 850;
+        bool pause = false;
 
         public Game1()
         {
@@ -57,12 +59,13 @@ namespace ProjectRevolution
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            planet = this.Content.Load<Texture2D>(@"CIRCLE");
-            star = this.Content.Load<Texture2D>(@"STAR");
+            planetSprite = this.Content.Load<Texture2D>(@"CIRCLE");
+            starSprite = this.Content.Load<Texture2D>(@"STAR");
+            tailSprite = this.Content.Load<Texture2D>(@"TAIL");
 
-            Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", star);
-            Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planet, sun, new Vector2(20000, 0));
-            Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planet, sun, new Vector2(-20000, 0));
+            Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", starSprite);
+            Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planetSprite, sun, new Vector2(20000, 0));
+            Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planetSprite, sun, new Vector2(-20000, 0));
 
             bodies.Add(sun);
             bodies.Add(earth);
@@ -95,36 +98,41 @@ namespace ProjectRevolution
                 Exit();
 
             MouseState mouse = Mouse.GetState();
-            if (mouse.LeftButton == ButtonState.Pressed)
+            if (!pause)
             {
-                if (mouseHold)
+                if (mouse.LeftButton == ButtonState.Pressed)
                 {
-                    dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X, initialPos.Y - mouse.Position.ToVector2().Y);
+                    if (mouseHold)
+                    {
+                        dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
+                            initialPos.Y - mouse.Position.ToVector2().Y);
+                    }
+                    else
+                    {
+                        initialPos = mouse.Position.ToVector2();
+                        mouseHold = true;
+                    }
+
                 }
-                else
+                else if (mouseHold == true && mouse.LeftButton == ButtonState.Released)
                 {
-                    initialPos = mouse.Position.ToVector2();
-                    mouseHold = true;
+                    mouseHold = false;
+                    Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
+
+                    initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
+                    initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
+
+                    Planet rngObject = new Planet(5.93 * Math.Pow(10, 25), 8, graphics.GraphicsDevice,
+                        initialPos, bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
+                    bodies.Add(rngObject);
+                    planets.Add(rngObject);
+                    spriteCache.Add(rngObject, new List<Vector2>());
                 }
-                
-            }
-            else if (mouseHold == true && mouse.LeftButton == ButtonState.Released)
-            {
-                mouseHold = false;
-                Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
 
-                initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
-                initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
-
-                Planet rngObject = new Planet(5.93 * Math.Pow(10, 25), 8, graphics.GraphicsDevice, initialPos, bodies.Count.ToString(), planet, bodies[0], shootVector);
-                bodies.Add(rngObject);
-                planets.Add(rngObject);
-                spriteCache.Add(rngObject, new List<Vector2>());
-            }
-
-            foreach (Planet planet in planets)
-            {
-                planet.updateVelocityAndPosition(bodies);
+                foreach (Planet planet in planets)
+                {
+                    planet.updateVelocityAndPosition(bodies);
+                }
             }
 
             base.Update(gameTime);
@@ -141,7 +149,6 @@ namespace ProjectRevolution
             spriteBatch.Begin();
             foreach (Body body in bodies)
             {
-                spriteBatch.Draw(body.Texture, body.Position);
                 if (!body.IsStar)
                 {
                     Planet planet = body as Planet;
@@ -152,9 +159,10 @@ namespace ProjectRevolution
                     }
                     foreach (Vector2 position in spriteCache[planet])
                     {
-                        spriteBatch.Draw(body.Texture, position);
+                        spriteBatch.Draw(tailSprite, position);
                     }
                 }
+                spriteBatch.Draw(body.Texture, body.Position);
 
             }
             spriteBatch.End();
