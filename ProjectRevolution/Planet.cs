@@ -22,8 +22,8 @@ namespace ProjectRevolution
             : base(mass, radius, graphicsDevice, name, texture)
         {
             this.isStar = false;
-            this.velocity.X = Convert.ToSingle((initialVelocity.X / scaleMultiplier) * timeSpeed);
-            this.velocity.Y = Convert.ToSingle((initialVelocity.Y / scaleMultiplier) * timeSpeed);
+            this.velocity.X = Convert.ToSingle((initialVelocity.X / scaleMultiplier));
+            this.velocity.Y = Convert.ToSingle((initialVelocity.Y / scaleMultiplier));
             this.distance = DetermineDistance(star);
 
             double posX = GetCenter(graphicsDevice).X - radius + (positionOffset.X);
@@ -34,7 +34,7 @@ namespace ProjectRevolution
         }
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
-        public void updateVelocityAndPosition(List<Body> bodies)
+        public void updateVelocityAndPosition(List<Body> bodies, GameTime gameTime)
         {
             Vector2 velocityVector = new Vector2();
 
@@ -57,10 +57,10 @@ namespace ProjectRevolution
                     // beräkna accelerationen genom a = F / m
                     double acceleration = force / this.mass;
                     // beräkna hastighet genom v = a * t
-                    double speed = acceleration * timeSpeed;
+                    double speed = acceleration * gameTime.ElapsedGameTime.TotalSeconds * timeSpeed;
 
                     // konvertera till ordentlig skala
-                    speed = (speed / scaleMultiplier) * timeSpeed;
+                    speed = (speed / scaleMultiplier);
 
                     // Beräknar vektorn i x- och y-led genom att multiplicera riktningen med hastigheten
                     float xVelocity = Convert.ToSingle(direction.X * speed);
@@ -74,8 +74,8 @@ namespace ProjectRevolution
             // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen beräknas utifrån den
             this.velocity += velocityVector;
 
-            this.position.X += velocity.X;
-            this.position.Y += velocity.Y;
+            this.position.X += velocity.X * Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds * timeSpeed);
+            this.position.Y += velocity.Y * Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds * timeSpeed);
 
             // GAMMAL REFERENSKOD
 

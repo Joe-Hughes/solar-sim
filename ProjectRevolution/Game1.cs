@@ -25,13 +25,14 @@ namespace ProjectRevolution
         Vector2 initialPos;
         Vector2 dragVector;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
-        int spriteCacheSize = 850;
+        int spriteCacheSize = 900;
         bool pause = false;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            IsFixedTimeStep = false;
             graphics.PreferredBackBufferWidth = 1024;  // set this value to the desired width of your window
             graphics.PreferredBackBufferHeight = 576;   // set this value to the desired height of your window
             graphics.ApplyChanges();
@@ -131,7 +132,7 @@ namespace ProjectRevolution
 
                 foreach (Planet planet in planets)
                 {
-                    planet.updateVelocityAndPosition(bodies);
+                    planet.updateVelocityAndPosition(bodies, gameTime);
                 }
             }
 
