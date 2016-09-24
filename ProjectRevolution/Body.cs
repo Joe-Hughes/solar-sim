@@ -70,6 +70,7 @@ namespace ProjectRevolution
         public static Vector2 GetCenter(GraphicsDevice graphicsDevice)
         {
             Point window = graphicsDevice.PresentationParameters.Bounds.Center;
+            window.X -= 162;
             Vector2 center = window.ToVector2();
 
             return center;

@@ -19,6 +19,7 @@ namespace ProjectRevolution
         Texture2D planetSprite;
         Texture2D starSprite;
         Texture2D tailSprite;
+        Texture2D menuSprite;
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
@@ -27,6 +28,8 @@ namespace ProjectRevolution
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
         int spriteCacheSize = 900;
         bool pause = false;
+        SpriteFont arial;
+        Rectangle menuBackground = new Rectangle(700, 0, 324, 576);
 
         public Game1()
         {
@@ -63,6 +66,8 @@ namespace ProjectRevolution
             planetSprite = this.Content.Load<Texture2D>(@"CIRCLE");
             starSprite = this.Content.Load<Texture2D>(@"STAR");
             tailSprite = this.Content.Load<Texture2D>(@"TAIL");
+            menuSprite = this.Content.Load<Texture2D>(@"MENU");
+            arial = this.Content.Load<SpriteFont>("StandardArial");
 
             Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", starSprite);
             Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planetSprite, sun, new Vector2(20000, 0));
@@ -164,8 +169,10 @@ namespace ProjectRevolution
                     }
                 }
                 spriteBatch.Draw(body.Texture, body.Position);
+                spriteBatch.DrawString(arial, "TEST TEXT", new Vector2(100, 100), new Color(new Vector3(255, 255, 255)));
 
             }
+            spriteBatch.Draw(menuSprite, menuBackground, new Color(new Vector3(1, 1, 1)));
             spriteBatch.End();
             
             base.Draw(gameTime);
