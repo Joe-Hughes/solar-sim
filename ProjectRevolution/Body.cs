@@ -22,8 +22,8 @@ namespace ProjectRevolution
         protected bool isStar = true;
         // Newtons konstant, gäller för alla kroppar med massa
         // enhet: Nm^2/kg^2
-        protected double scaleMultiplier = 1.06857 * Math.Pow(10, 9); // TODO: generera i kod istället för att använda ett arbiträrt nummer
-        protected double timeSpeed = 840000; // TODO använd variable time step istället för fixed
+        public static double scaleMultiplier = 1.06857 * Math.Pow(10, 9); // TODO: generera i kod istället för att använda ett arbiträrt nummer
+        protected double timeSpeed = 840000;
 
         protected double gravConstant = 6.67408 * Math.Pow(10, -11);
 
@@ -49,7 +49,7 @@ namespace ProjectRevolution
 
         // returnerar distansen mellan denna och en annan kropp genom Pytagoras sats
         // enhet: positioner (INTE meter)
-        protected double DetermineDistance(Body otherBody)
+        public double DetermineDistance(Body otherBody)
         {
             double radius1 = this.radius;
             double radius2 = otherBody.radius;

@@ -20,6 +20,7 @@ namespace ProjectRevolution
         Texture2D starSprite;
         Texture2D tailSprite;
         Texture2D menuSprite;
+        Texture2D markerSprite;
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
@@ -30,6 +31,8 @@ namespace ProjectRevolution
         bool pause = false;
         SpriteFont arial;
         Rectangle menuBackground = new Rectangle(700, 0, 324, 576);
+        Body selected;
+        bool isSelected = false;
 
         public Game1()
         {
@@ -67,15 +70,16 @@ namespace ProjectRevolution
             starSprite = this.Content.Load<Texture2D>(@"STAR");
             tailSprite = this.Content.Load<Texture2D>(@"TAIL");
             menuSprite = this.Content.Load<Texture2D>(@"MENU");
+            markerSprite = this.Content.Load<Texture2D>(@"MARKER");
             arial = this.Content.Load<SpriteFont>("StandardArial");
 
             Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", starSprite);
             Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planetSprite, sun, new Vector2(20000, 0));
-            Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planetSprite, sun, new Vector2(-20000, 0));
+            //Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planetSprite, sun, new Vector2(-20000, 0));
 
             bodies.Add(sun);
             bodies.Add(earth);
-            bodies.Add(planet2);
+            //bodies.Add(planet2);
             //bodies.Add(planet3);
             foreach (Body body in bodies)
             {
@@ -108,17 +112,31 @@ namespace ProjectRevolution
             {
                 if (mouse.LeftButton == ButtonState.Pressed)
                 {
-                    if (mouseHold)
+                    if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
                     {
-                        dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
-                            initialPos.Y - mouse.Position.ToVector2().Y);
+                        if (mouseHold)
+                        {
+                            dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
+                                initialPos.Y - mouse.Position.ToVector2().Y);
+                        }
+                        else
+                        {
+                            initialPos = mouse.Position.ToVector2();
+                            mouseHold = true;
+                        }
                     }
                     else
                     {
-                        initialPos = mouse.Position.ToVector2();
-                        mouseHold = true;
+                        foreach (Body body in bodies)
+                        {
+                            if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
+                                && (mouse.Position.Y - body.Position.Y < 16 && mouse.Position.Y - body.Position.Y > 0))
+                            {
+                                selected = body;
+                                isSelected = true;
+                            }
+                        }
                     }
-
                 }
                 else if (mouseHold == true && mouse.LeftButton == ButtonState.Released)
                 {
@@ -129,7 +147,7 @@ namespace ProjectRevolution
                     initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
 
                     Planet rngObject = new Planet(5.93 * Math.Pow(10, 25), 8, graphics.GraphicsDevice,
-                        initialPos, bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
+                        initialPos, "Planet" + bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
                     bodies.Add(rngObject);
                     planets.Add(rngObject);
                     spriteCache.Add(rngObject, new List<Vector2>());
@@ -168,11 +186,29 @@ namespace ProjectRevolution
                         spriteBatch.Draw(tailSprite, position);
                     }
                 }
+                
                 spriteBatch.Draw(body.Texture, body.Position);
-                spriteBatch.DrawString(arial, "TEST TEXT", new Vector2(100, 100), new Color(new Vector3(255, 255, 255)));
-
+                if (body == selected)
+                {
+                    spriteBatch.Draw(markerSprite, body.Position);
+                }
             }
             spriteBatch.Draw(menuSprite, menuBackground, new Color(new Vector3(1, 1, 1)));
+
+            if (isSelected)
+            {
+                spriteBatch.Draw(selected.Texture, new Vector2(720, 10));
+                spriteBatch.DrawString(arial, selected.Name, new Vector2(770, 10), new Color(new Vector3(0, 0, 0)));
+                if (!selected.IsStar)
+                {
+                    Planet planet = selected as Planet;
+                    spriteBatch.DrawString(arial, "Distance from sun: " + (selected.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(720, 70), new Color(new Vector3(0, 0, 0)));
+                    spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(720, 110), new Color(new Vector3(0, 0, 0)));
+                    spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(720, 150), new Color(new Vector3(0, 0, 0)));
+                    spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(720, 190), new Color(new Vector3(0, 0, 0)));
+                }
+            }
+
             spriteBatch.End();
             
             base.Draw(gameTime);

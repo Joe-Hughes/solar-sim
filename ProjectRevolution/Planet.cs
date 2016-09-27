@@ -13,9 +13,15 @@ namespace ProjectRevolution
     {
         private double distance; // från stjärna/centrum
         private Vector2 velocity;
+        private double acceleration;
+        private double force;
+        private double speed;
 
-        private Vector2 Velocity { get { return velocity; } }
-        private double DistanceFromStar { get { return distance; } }
+        public Vector2 Velocity { get { return velocity; } }
+        public double DistanceFromStar { get { return distance; } }
+        public double Acceleration { get { return acceleration; } }
+        public double Force { get { return force; } }
+        public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
 
         public Planet(double mass, double radius, GraphicsDevice graphicsDevice, Vector2 positionOffset,
             string name, Texture2D texture, Body star, Vector2 initialVelocity)
@@ -53,11 +59,11 @@ namespace ProjectRevolution
                     // TODO prova att ta bort scale multiplier, bör ha samma resultat då man räknar i positioner istället för meter.
 
                     // gravitationslagen F = G * (m*M / r^2)
-                    double force = this.gravConstant * ((this.mass * otherBody.Mass) / Math.Pow(DetermineDistance(otherBody) * scaleMultiplier, 2));
+                    force = this.gravConstant * ((this.mass * otherBody.Mass) / Math.Pow(DetermineDistance(otherBody) * scaleMultiplier, 2));
                     // beräkna accelerationen genom a = F / m
-                    double acceleration = force / this.mass;
+                    acceleration = force / this.mass;
                     // beräkna hastighet genom v = a * t
-                    double speed = acceleration * gameTime.ElapsedGameTime.TotalSeconds * timeSpeed;
+                    speed = acceleration * gameTime.ElapsedGameTime.TotalSeconds * timeSpeed;
 
                     // konvertera till ordentlig skala
                     speed = (speed / scaleMultiplier);
@@ -76,26 +82,6 @@ namespace ProjectRevolution
 
             this.position.X += velocity.X * Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds * timeSpeed);
             this.position.Y += velocity.Y * Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds * timeSpeed);
-
-            // GAMMAL REFERENSKOD
-
-            //Vector2 direct = new Vector2(Convert.ToSingle(disX), Convert.ToSingle(disY));
-            //direct.Normalize();
-
-            //// G * (m*M / distance^2) - enhet: F
-            //// dela med massa - enhet: acceleration
-            //// Gångra med tid - enhet: hastighet
-            //double vel = ((((((body2mass * bodymass) / Math.Pow(distance, 2)) * G) / bodymass) * timeSpeed) / (1.68571 * Math.Pow(10, 8))) * timeSpeed;
-            //float velx = body.GetVelocity().X + Convert.ToSingle(direct.X * vel);
-            //float vely = body.GetVelocity().Y + Convert.ToSingle(direct.Y * vel);
-            //Vector2 velVect = new Vector2(velx, vely);
-
-            //float posx = body.GetPosition().X + velx;
-            //float posy = body.GetPosition().Y + vely;
-            //Vector2 posVect = new Vector2(posx, posy);
-
-            //body.SetVelocity(velVect);
-            //body.SetPosition(posVect);
         }
     }
 }
