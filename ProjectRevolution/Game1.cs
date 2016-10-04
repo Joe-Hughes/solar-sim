@@ -60,7 +60,6 @@ namespace ProjectRevolution
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             this.IsMouseVisible = true;
 
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f/60.0f);
@@ -84,14 +83,12 @@ namespace ProjectRevolution
             txtBoxSprite = this.Content.Load<Texture2D>(@"TXTBOX");
             arial = this.Content.Load<SpriteFont>("StandardArial");
 
-            Body sun = new Body(1.9885 * Math.Pow(10, 30), starSprite.Width, graphics.GraphicsDevice, "Sun", starSprite);
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), planetSprite.Width, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planetSprite, sun, new Vector2(29800, 0));
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), planetSprite.Width, graphics.GraphicsDevice, new Vector2(0, -200), "Mars", planetSprite, sun, new Vector2(24100, 0));
-
-
+            // Skapar kroppar och lägger dem i systemet
+            Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics.GraphicsDevice);
             bodies.Add(sun);
+
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), 149.6, "Earth", planetSprite, sun, 29.8, graphics.GraphicsDevice);
             bodies.Add(earth);
-            bodies.Add(mars);
 
             foreach (Body body in bodies)
             {
@@ -167,11 +164,11 @@ namespace ProjectRevolution
                         initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
                         initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
 
-                        Planet rngObject = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice,
-                            initialPos, "Planet" + bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
-                        bodies.Add(rngObject);
-                        planets.Add(rngObject);
-                        spriteCache.Add(rngObject, new List<Vector2>());
+                        //Planet rngObject = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice,
+                        //    initialPos, "Planet" + bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
+                        //bodies.Add(rngObject);
+                        //planets.Add(rngObject);
+                        //spriteCache.Add(rngObject, new List<Vector2>());
                     }
 
                     foreach (Planet planet in planets)

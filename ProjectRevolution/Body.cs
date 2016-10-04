@@ -15,7 +15,7 @@ namespace ProjectRevolution
         protected Vector2 position; // enhet: positioner (inte meter eller pixlar)
         protected double mass; // enhet: kilogram
         protected string name;
-        protected internal double radius; // enhet: meter
+        protected internal double radius; // Texturens radie, enhet: pixlar
         protected Texture2D texture;
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
@@ -35,10 +35,10 @@ namespace ProjectRevolution
         public bool IsStar { get { return isStar; } }
 
         // Denna konstruktor används för stjärnor
-        public Body(double mass, double radius, GraphicsDevice graphicsDevice, string name, Texture2D texture)
+        public Body(double mass, string name, Texture2D texture, GraphicsDevice graphicsDevice)
         {
             this.mass = mass;
-            this.radius = radius;
+            this.radius = texture.Width / 2;
             this.name = name;
             this.texture = texture;
 

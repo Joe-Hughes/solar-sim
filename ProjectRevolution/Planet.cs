@@ -20,25 +20,28 @@ namespace ProjectRevolution
 
 
         public Vector2 Velocity { get { return velocity; } }
-        public double DistanceFromStar { get { return distance; } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
         public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
 
-        public Planet(double mass, double radius, GraphicsDevice graphicsDevice, Vector2 positionOffset,
-            string name, Texture2D texture, Body star, Vector2 initialVelocity)
-            : base(mass, radius, graphicsDevice, name, texture)
+        public Planet(double mass, double distanceFromStar, string name, Texture2D texture,
+            Body star, double initialVelocity, GraphicsDevice graphicsDevice)
+            : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
-            this.velocity.X = Convert.ToSingle((initialVelocity.X / scaleMultiplier));
-            this.velocity.Y = Convert.ToSingle((initialVelocity.Y / scaleMultiplier));
-            this.distance = DetermineDistance(star);
+            this.velocity.X = Convert.ToSingle(((initialVelocity * 1000) / scaleMultiplier));
 
-            double posX = GetCenter(graphicsDevice).X - radius + (positionOffset.X);
-            double posY = GetCenter(graphicsDevice).Y - radius + (positionOffset.Y);
-            this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
-            
-            
+            //Vector2 angleVector = AngleToVector(angle);
+            //Console.WriteLine("AngleVector: " + angleVector);
+            //angleVector.Normalize();
+            //Console.WriteLine("Normalized: " + angleVector);
+            //angleVector = Vector2.Multiply(angleVector, (float)(distanceFromStar / scaleMultiplier));
+            //Console.WriteLine("Multiplied: " + angleVector);
+            double posX = GetCenter(graphicsDevice).X - radius;
+            double posY = GetCenter(graphicsDevice).Y - radius + (-140);
+            Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
+            this.position = initPosition;
+
         }
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
@@ -90,6 +93,14 @@ namespace ProjectRevolution
             oldSpeed = speed;
         }
 
-        
+        static Vector2 AngleToVector(float angle)
+        {
+            return new Vector2((float)Math.Sin(angle), -(float)Math.Cos(angle));
+        }
+
+        static float VectorToAngle(Vector2 vector)
+        {
+            return (float)Math.Atan2(vector.X, -vector.Y);
+        }
     }
 }
