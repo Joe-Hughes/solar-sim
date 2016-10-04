@@ -16,6 +16,8 @@ namespace ProjectRevolution
         private double acceleration;
         private double force;
         private double speed;
+        private double oldSpeed = 0;
+
 
         public Vector2 Velocity { get { return velocity; } }
         public double DistanceFromStar { get { return distance; } }
@@ -40,7 +42,7 @@ namespace ProjectRevolution
         }
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
-        public void updateVelocityAndPosition(List<Body> bodies, GameTime gameTime)
+        public void updateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
         {
             Vector2 velocityVector = new Vector2();
 
@@ -61,16 +63,16 @@ namespace ProjectRevolution
                     // gravitationslagen F = G * (m*M / r^2)
                     force = this.gravConstant * ((this.mass * otherBody.Mass) / Math.Pow(DetermineDistance(otherBody) * scaleMultiplier, 2));
                     // beräkna accelerationen genom a = F / m
-                    acceleration = force / this.mass;
+                    double appliedAcceleration = force / this.mass;
                     // beräkna hastighet genom v = a * t
-                    speed = acceleration * gameTime.ElapsedGameTime.TotalSeconds * timeSpeed;
+                    double appliedSpeed = appliedAcceleration * totalSecondsSinceUpdate * timeSpeed;
 
                     // konvertera till ordentlig skala
-                    speed = (speed / scaleMultiplier);
+                    appliedSpeed = (appliedSpeed / scaleMultiplier);
 
                     // Beräknar vektorn i x- och y-led genom att multiplicera riktningen med hastigheten
-                    float xVelocity = Convert.ToSingle(direction.X * speed);
-                    float yVelocity = Convert.ToSingle(direction.Y * speed);
+                    float xVelocity = Convert.ToSingle(direction.X * appliedSpeed);
+                    float yVelocity = Convert.ToSingle(direction.Y * appliedSpeed);
 
                     velocityVector.X += xVelocity;
                     velocityVector.Y += yVelocity;
@@ -80,8 +82,14 @@ namespace ProjectRevolution
             // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen beräknas utifrån den
             this.velocity += velocityVector;
 
-            this.position.X += velocity.X * Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds * timeSpeed);
-            this.position.Y += velocity.Y * Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds * timeSpeed);
+            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+
+            speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
+            acceleration = (speed - oldSpeed) * totalSecondsSinceUpdate; 
+            oldSpeed = speed;
         }
+
+        
     }
 }

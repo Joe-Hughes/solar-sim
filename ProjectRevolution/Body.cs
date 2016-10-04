@@ -23,7 +23,7 @@ namespace ProjectRevolution
         // Newtons konstant, gäller för alla kroppar med massa
         // enhet: Nm^2/kg^2
         public static double scaleMultiplier = 1.06857 * Math.Pow(10, 9); // TODO: generera i kod istället för att använda ett arbiträrt nummer
-        protected double timeSpeed = 840000;
+        protected double timeSpeed = 840000;    //840000
 
         protected double gravConstant = 6.67408 * Math.Pow(10, -11);
 

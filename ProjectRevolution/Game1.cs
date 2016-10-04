@@ -21,6 +21,7 @@ namespace ProjectRevolution
         Texture2D tailSprite;
         Texture2D menuSprite;
         Texture2D markerSprite;
+        Texture2D txtBoxSprite;
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
@@ -34,11 +35,18 @@ namespace ProjectRevolution
         Body selected;
         bool isSelected = false;
 
+        double d = 0.02;
+        double u = 0.01;
+
+        double oldTotalUpdateTime = 0.01;
+        double oldTotalDrawTime = 0.02;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsFixedTimeStep = false;
+            graphics.SynchronizeWithVerticalRetrace = false;
             graphics.PreferredBackBufferWidth = 1024;  // set this value to the desired width of your window
             graphics.PreferredBackBufferHeight = 576;   // set this value to the desired height of your window
             graphics.ApplyChanges();
@@ -55,6 +63,8 @@ namespace ProjectRevolution
             // TODO: Add your initialization logic here
             this.IsMouseVisible = true;
 
+            //this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f/60.0f);
+            //graphics.GraphicsDevice.PresentationParameters.PresentationInterval = PresentInterval.One;
             base.Initialize();
         }
 
@@ -71,6 +81,7 @@ namespace ProjectRevolution
             tailSprite = this.Content.Load<Texture2D>(@"TAIL");
             menuSprite = this.Content.Load<Texture2D>(@"MENU");
             markerSprite = this.Content.Load<Texture2D>(@"MARKER");
+            txtBoxSprite = this.Content.Load<Texture2D>(@"TXTBOX");
             arial = this.Content.Load<SpriteFont>("StandardArial");
 
             Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", starSprite);
@@ -104,62 +115,68 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            if (u >= 0.01)
+            { 
+                if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    Exit();
 
-            MouseState mouse = Mouse.GetState();
-            if (!pause)
-            {
-                if (mouse.LeftButton == ButtonState.Pressed)
+                MouseState mouse = Mouse.GetState();
+                if (!pause)
                 {
-                    if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+                    if (mouse.LeftButton == ButtonState.Pressed)
                     {
-                        if (mouseHold)
+                        if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
                         {
-                            dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
-                                initialPos.Y - mouse.Position.ToVector2().Y);
+                            if (mouseHold)
+                            {
+                                dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
+                                    initialPos.Y - mouse.Position.ToVector2().Y);
+                            }
+                            else
+                            {
+                                initialPos = mouse.Position.ToVector2();
+                                mouseHold = true;
+                            }
                         }
                         else
                         {
-                            initialPos = mouse.Position.ToVector2();
-                            mouseHold = true;
-                        }
-                    }
-                    else
-                    {
-                        foreach (Body body in bodies)
-                        {
-                            if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
-                                && (mouse.Position.Y - body.Position.Y < 16 && mouse.Position.Y - body.Position.Y > 0))
+                            foreach (Body body in bodies)
                             {
-                                selected = body;
-                                isSelected = true;
+                                if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
+                                    && (mouse.Position.Y - body.Position.Y < 16 && mouse.Position.Y - body.Position.Y > 0))
+                                {
+                                    selected = body;
+                                    isSelected = true;
+                                }
                             }
                         }
                     }
-                }
-                else if (mouseHold == true && mouse.LeftButton == ButtonState.Released)
-                {
-                    mouseHold = false;
-                    Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
+                    else if (mouseHold == true && mouse.LeftButton == ButtonState.Released)
+                    {
+                        mouseHold = false;
+                        Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
 
-                    initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
-                    initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
+                        initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
+                        initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
 
-                    Planet rngObject = new Planet(5.93 * Math.Pow(10, 25), 8, graphics.GraphicsDevice,
-                        initialPos, "Planet" + bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
-                    bodies.Add(rngObject);
-                    planets.Add(rngObject);
-                    spriteCache.Add(rngObject, new List<Vector2>());
-                }
+                        Planet rngObject = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice,
+                            initialPos, "Planet" + bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
+                        bodies.Add(rngObject);
+                        planets.Add(rngObject);
+                        spriteCache.Add(rngObject, new List<Vector2>());
+                    }
 
-                foreach (Planet planet in planets)
-                {
-                    planet.updateVelocityAndPosition(bodies, gameTime);
+                    foreach (Planet planet in planets)
+                    {
+                        planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                    }
                 }
+                Console.WriteLine("Update: " + gameTime.ElapsedGameTime.TotalSeconds.ToString() + "   :   " + IrlTotalUpdateTime(gameTime));
+                base.Update(gameTime);
+                oldTotalUpdateTime = gameTime.TotalGameTime.TotalSeconds;
+                u = 0;
             }
-
-            base.Update(gameTime);
+            u += gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         /// <summary>
@@ -168,50 +185,71 @@ namespace ProjectRevolution
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            //MakeDaPictures
-            graphics.GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
-            foreach (Body body in bodies)
-            {
-                if (!body.IsStar)
-                {
-                    Planet planet = body as Planet;
-                    spriteCache[planet].Add(body.Position);
-                    if (spriteCache[planet].Count >= spriteCacheSize)
-                    {
-                        spriteCache[planet].RemoveAt(0);
-                    }
-                    foreach (Vector2 position in spriteCache[planet])
-                    {
-                        spriteBatch.Draw(tailSprite, position);
-                    }
-                }
-                
-                spriteBatch.Draw(body.Texture, body.Position);
-                if (body == selected)
-                {
-                    spriteBatch.Draw(markerSprite, body.Position);
-                }
-            }
-            spriteBatch.Draw(menuSprite, menuBackground, new Color(new Vector3(1, 1, 1)));
-
-            if (isSelected)
-            {
-                spriteBatch.Draw(selected.Texture, new Vector2(720, 10));
-                spriteBatch.DrawString(arial, selected.Name, new Vector2(770, 10), new Color(new Vector3(0, 0, 0)));
-                if (!selected.IsStar)
-                {
-                    Planet planet = selected as Planet;
-                    spriteBatch.DrawString(arial, "Distance from sun: " + (selected.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(720, 70), new Color(new Vector3(0, 0, 0)));
-                    spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(720, 110), new Color(new Vector3(0, 0, 0)));
-                    spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(720, 150), new Color(new Vector3(0, 0, 0)));
-                    spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(720, 190), new Color(new Vector3(0, 0, 0)));
-                }
-            }
-
-            spriteBatch.End();
             
-            base.Draw(gameTime);
+            if (d >= 0.02)
+            {
+                //MakeDaPictures
+                graphics.GraphicsDevice.Clear(Color.Black);
+                spriteBatch.Begin();
+                foreach (Body body in bodies)
+                {
+                    if (!body.IsStar)
+                    {
+                        Planet planet = body as Planet;
+                        spriteCache[planet].Add(body.Position);
+                        if (spriteCache[planet].Count >= spriteCacheSize)
+                        {
+                            spriteCache[planet].RemoveAt(0);
+                        }
+                        foreach (Vector2 position in spriteCache[planet])
+                        {
+                            spriteBatch.Draw(tailSprite, position);
+                        }
+                    }
+
+                    spriteBatch.Draw(body.Texture, body.Position);
+                    if (body == selected)
+                    {
+                        spriteBatch.Draw(markerSprite, new Vector2(body.Position.X - 3, body.Position.Y - 3));
+                    }
+                }
+                spriteBatch.Draw(menuSprite, null, menuBackground);
+                spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
+                double updateTime = IrlTotalUpdateTime(gameTime);
+                if (updateTime != 0)
+                    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / updateTime), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
+                
+
+                if (isSelected)
+                {
+                    spriteBatch.Draw(selected.Texture, new Vector2(720, 10));
+                    spriteBatch.DrawString(arial, selected.Name, new Vector2(770, 10), new Color(new Vector3(0, 0, 0)));
+                    if (!selected.IsStar)
+                    {
+                        //Acc still does not work properly
+                        Planet planet = selected as Planet;
+                        spriteBatch.DrawString(arial, "Distance from sun: " + (selected.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(720, 70), new Color(new Vector3(0, 0, 0)));
+                        spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(720, 110), new Color(new Vector3(0, 0, 0)));
+                        spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(720, 150), new Color(new Vector3(0, 0, 0)));
+                        spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(720, 190), new Color(new Vector3(0, 0, 0)));
+                    }
+                }
+                spriteBatch.End();
+                base.Draw(gameTime);
+                oldTotalDrawTime = gameTime.TotalGameTime.TotalSeconds;
+                d = 0;
+            }
+            d += gameTime.ElapsedGameTime.TotalSeconds;
+        }
+
+        public double IrlTotalUpdateTime(GameTime gametime)
+        {
+            return gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTime;
+        }
+
+        public double IrlTotalDrawTime(GameTime gametime)
+        {
+            return gametime.TotalGameTime.TotalSeconds - oldTotalDrawTime;
         }
     }
 }
