@@ -28,7 +28,7 @@ namespace ProjectRevolution
         Vector2 initialPos;
         Vector2 dragVector;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
-        int spriteCacheSize = 900;
+        int spriteCacheSize = 3000;
         bool pause = false;
         SpriteFont arial;
         Rectangle menuBackground = new Rectangle(700, 0, 324, 576);
@@ -47,8 +47,8 @@ namespace ProjectRevolution
             Content.RootDirectory = "Content";
             IsFixedTimeStep = false;
             graphics.SynchronizeWithVerticalRetrace = false;
-            graphics.PreferredBackBufferWidth = 1024;  // set this value to the desired width of your window
-            graphics.PreferredBackBufferHeight = 576;   // set this value to the desired height of your window
+            graphics.PreferredBackBufferWidth = 1024;  // Window width
+            graphics.PreferredBackBufferHeight = 576;   // Window height
             graphics.ApplyChanges();
         }
 
@@ -84,14 +84,15 @@ namespace ProjectRevolution
             txtBoxSprite = this.Content.Load<Texture2D>(@"TXTBOX");
             arial = this.Content.Load<SpriteFont>("StandardArial");
 
-            Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", starSprite);
-            Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planetSprite, sun, new Vector2(20000, 0));
-            //Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planetSprite, sun, new Vector2(-20000, 0));
+            Body sun = new Body(1.9885 * Math.Pow(10, 30), starSprite.Width, graphics.GraphicsDevice, "Sun", starSprite);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), planetSprite.Width, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planetSprite, sun, new Vector2(29800, 0));
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), planetSprite.Width, graphics.GraphicsDevice, new Vector2(0, -200), "Mars", planetSprite, sun, new Vector2(24100, 0));
+
 
             bodies.Add(sun);
             bodies.Add(earth);
-            //bodies.Add(planet2);
-            //bodies.Add(planet3);
+            bodies.Add(mars);
+
             foreach (Body body in bodies)
             {
                 if (!body.IsStar)
@@ -134,8 +135,15 @@ namespace ProjectRevolution
                             }
                             else
                             {
-                                initialPos = mouse.Position.ToVector2();
-                                mouseHold = true;
+                                // Makes sure that mouse is not outside of the space area when spawning planets
+                                int x = mouse.Position.X;
+                                int y = mouse.Position.Y;
+                                if (x > 0 && x < (graphics.PreferredBackBufferWidth - menuBackground.Width) &&
+                                    y > 0 && y < graphics.PreferredBackBufferHeight)
+                                {
+                                    initialPos = mouse.Position.ToVector2();
+                                    mouseHold = true;
+                                }
                             }
                         }
                         else
@@ -186,7 +194,7 @@ namespace ProjectRevolution
         protected override void Draw(GameTime gameTime)
         {
             
-            if (d >= 0.02)
+            if (d >= 0.0167)
             {
                 //MakeDaPictures
                 graphics.GraphicsDevice.Clear(Color.Black);
