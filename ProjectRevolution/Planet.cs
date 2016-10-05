@@ -11,7 +11,6 @@ namespace ProjectRevolution
 {
     class Planet : Body
     {
-        private double distance; // från stjärna/centrum
         private Vector2 velocity;
         private double acceleration;
         private double force;
@@ -24,8 +23,8 @@ namespace ProjectRevolution
         public double Force { get { return force; } }
         public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
 
-        public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle,
-            Texture2D texture, Body star, double initialVelocity, GraphicsDevice graphicsDevice)
+        public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
+            double initialVelocity, Texture2D texture, Body star, GraphicsDevice graphicsDevice)
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
@@ -45,7 +44,20 @@ namespace ProjectRevolution
             // Skapar en vektor som har en riktning enligt velocityAngle och längd enligt initialVelocity
             Vector2 velocityVector = AngleToVector(velocityAngle);
             this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
+        }
 
+        //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
+        public Planet(double mass, string name, Vector2 position, Vector2 velocity,
+            Texture2D texture, Body star, GraphicsDevice graphicsDevice)
+            : base(mass, name, texture, graphicsDevice)
+        {
+            this.isStar = false;
+
+            this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
+
+            double posX = GetCenter(graphicsDevice).X - radius + position.X;
+            double posY = GetCenter(graphicsDevice).Y - radius + position.Y;
+            this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
         }
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position

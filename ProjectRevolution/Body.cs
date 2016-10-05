@@ -66,7 +66,7 @@ namespace ProjectRevolution
 
             return hypotenuse;
         }
-
+        // Statisk Overload-funktion för när man behöver veta distansen mellan en viss punkt och en kropp.
         public static double DetermineDistance(Vector2 position,Body otherBody)
         {
             // radien behöver adderas på distansen då positionen tas från det över vänstra hörnet av kroppen.
