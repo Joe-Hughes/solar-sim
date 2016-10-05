@@ -87,7 +87,7 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics.GraphicsDevice);
             bodies.Add(sun);
 
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), 149.6, "Earth", planetSprite, sun, 29.8, graphics.GraphicsDevice);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 0, 270, planetSprite, sun, 29.8, graphics.GraphicsDevice);
             bodies.Add(earth);
 
             foreach (Body body in bodies)
@@ -164,11 +164,13 @@ namespace ProjectRevolution
                         initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
                         initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
 
-                        //Planet rngObject = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice,
-                        //    initialPos, "Planet" + bodies.Count.ToString(), planetSprite, bodies[0], shootVector);
-                        //bodies.Add(rngObject);
-                        //planets.Add(rngObject);
-                        //spriteCache.Add(rngObject, new List<Vector2>());
+                        Planet rngObject = new Planet(5.93 * Math.Pow(10, 24), "Planet" + bodies.Count.ToString(),
+                            Body.DetermineDistance(initialPos, bodies[0]), Planet.VectorToAngle(shootVector), Planet.VectorToAngle(initialPos),
+                            planetSprite, bodies[0], Vector2.Distance(Vector2.Zero, shootVector),graphics.GraphicsDevice);
+                        Console.WriteLine(Body.DetermineDistance(initialPos, bodies[0]));
+                        bodies.Add(rngObject);
+                        planets.Add(rngObject);
+                        spriteCache.Add(rngObject, new List<Vector2>());
                     }
 
                     foreach (Planet planet in planets)

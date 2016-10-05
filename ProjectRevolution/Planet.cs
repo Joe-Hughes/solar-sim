@@ -24,23 +24,27 @@ namespace ProjectRevolution
         public double Force { get { return force; } }
         public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
 
-        public Planet(double mass, double distanceFromStar, string name, Texture2D texture,
-            Body star, double initialVelocity, GraphicsDevice graphicsDevice)
+        public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle,
+            Texture2D texture, Body star, double initialVelocity, GraphicsDevice graphicsDevice)
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
-            this.velocity.X = Convert.ToSingle(((initialVelocity * 1000) / scaleMultiplier));
 
-            //Vector2 angleVector = AngleToVector(angle);
-            //Console.WriteLine("AngleVector: " + angleVector);
-            //angleVector.Normalize();
-            //Console.WriteLine("Normalized: " + angleVector);
-            //angleVector = Vector2.Multiply(angleVector, (float)(distanceFromStar / scaleMultiplier));
-            //Console.WriteLine("Multiplied: " + angleVector);
-            double posX = GetCenter(graphicsDevice).X - radius;
-            double posY = GetCenter(graphicsDevice).Y - radius + (-140);
+            // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
+            Vector2 angleVector = AngleToVector(positionAngle);
+            Console.WriteLine("AngleVector: " + angleVector);
+            // Konverterar till meter och förlänger vektorn med korrekt skala givet distansen
+            angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
+            Console.WriteLine("Multiplied: " + angleVector);
+
+            double posX = GetCenter(graphicsDevice).X - radius + angleVector.X;
+            double posY = GetCenter(graphicsDevice).Y - radius + angleVector.Y;
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
+
+            // Skapar en vektor som har en riktning enligt velocityAngle och längd enligt initialVelocity
+            Vector2 velocityVector = AngleToVector(velocityAngle);
+            this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
 
         }
 
@@ -93,14 +97,18 @@ namespace ProjectRevolution
             oldSpeed = speed;
         }
 
-        static Vector2 AngleToVector(float angle)
+        // Konverterar en vinkel angiven i grader och returnerar en vektor motsvarande den platsen i enhetscirkeln.
+        public static Vector2 AngleToVector(double angle)
         {
-            return new Vector2((float)Math.Sin(angle), -(float)Math.Cos(angle));
+            double radians = angle * (Math.PI / 180);
+            return new Vector2((float)Math.Cos(radians), -(float)Math.Sin(radians));
         }
 
-        static float VectorToAngle(Vector2 vector)
+        // Konverterar en position i enhetscirkeln till motsvarande vinkel i grader.
+        public static float VectorToAngle(Vector2 vector)
         {
-            return (float)Math.Atan2(vector.X, -vector.Y);
+            double radians = Math.Atan2(vector.X, -vector.Y);
+            return (float)(radians * (Math.PI / 180));
         }
     }
 }

@@ -67,6 +67,21 @@ namespace ProjectRevolution
             return hypotenuse;
         }
 
+        public static double DetermineDistance(Vector2 position,Body otherBody)
+        {
+            // radien behöver adderas på distansen då positionen tas från det över vänstra hörnet av kroppen.
+            double xDistance = (otherBody.position.X + otherBody.radius) - position.X;
+            double yDistance = (otherBody.position.Y + otherBody.radius) - position.Y;
+
+            // c = sqrt(a^2 + b^2)
+            double hypotenuse = (Math.Sqrt(Math.Pow(xDistance, 2) + Math.Pow(yDistance, 2)));
+
+            // om distansen hade angets i meter
+            //hypotenuse *= scaleMultiplier;
+
+            return hypotenuse;
+        }
+
         public static Vector2 GetCenter(GraphicsDevice graphicsDevice)
         {
             Point window = graphicsDevice.PresentationParameters.Bounds.Center;
