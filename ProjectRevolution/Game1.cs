@@ -22,9 +22,13 @@ namespace ProjectRevolution
         Texture2D menuSprite;
         Texture2D markerSprite;
         Texture2D txtBoxSprite;
+        Texture2D pauseBtnSprite;
+        Texture2D playBtnSprite;
+        Rectangle pauseBtn;
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
+        bool shiftMouseHold = false;
         Vector2 initialPos;
         Vector2 dragVector;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
@@ -45,12 +49,14 @@ namespace ProjectRevolution
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsFixedTimeStep = false;
-            graphics.SynchronizeWithVerticalRetrace = false;
-            graphics.PreferredBackBufferWidth = 1366;  // Window width (1024)
-            graphics.PreferredBackBufferHeight = 768;   // Window height (576)
-            //graphics.ToggleFullScreen();
+            IsFixedTimeStep = false;    // unlocks framerate
+            graphics.SynchronizeWithVerticalRetrace = false;    // disables Vsync
+            graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window
+            graphics.PreferredBackBufferHeight = 768;   // set this value to the desired height of your window
+            graphics.IsFullScreen = false;
             graphics.ApplyChanges();
+            menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
+            pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
         }
 
         /// <summary>
@@ -79,12 +85,16 @@ namespace ProjectRevolution
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // Loads all the sprites needed
             planetSprite = this.Content.Load<Texture2D>(@"CIRCLE");
             starSprite = this.Content.Load<Texture2D>(@"STAR");
             tailSprite = this.Content.Load<Texture2D>(@"TAIL");
             menuSprite = this.Content.Load<Texture2D>(@"MENU");
             markerSprite = this.Content.Load<Texture2D>(@"MARKER");
             txtBoxSprite = this.Content.Load<Texture2D>(@"TXTBOX");
+            pauseBtnSprite = this.Content.Load<Texture2D>(@"PauseBtn");
+            playBtnSprite = this.Content.Load<Texture2D>(@"PlayBtn");
             arial = this.Content.Load<SpriteFont>("StandardArial");
 
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
@@ -123,7 +133,6 @@ namespace ProjectRevolution
                     spriteCache.Add(planet, new List<Vector2>());
                 }
             }
-
         }
 
         /// <summary>
@@ -143,13 +152,25 @@ namespace ProjectRevolution
                     Exit();
 
                 MouseState mouse = Mouse.GetState();
-                if (!pause)
-                {
-                    if (mouse.LeftButton == ButtonState.Pressed)
+                if (mouse.LeftButton == ButtonState.Pressed)
+                { 
+                    if(mouseHold == false && IsMouseInArea(mouse, pauseBtn.Location, pauseBtn.Height, pauseBtn.Width))
                     {
-                        if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+                        if(pause)
                         {
-                            if (mouseHold)
+                            pause = false;
+                        }
+                        else
+                        {
+                            pause = true;
+                        }
+                    }
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+                    {
+                        if (!pause)
+                        {
+                            if (shiftMouseHold)
                             {
                                 dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
                                     initialPos.Y - mouse.Position.ToVector2().Y);
@@ -168,22 +189,28 @@ namespace ProjectRevolution
                                 }
                             }
                         }
-                        else
+                    }
+
+                    else
+                    {
+                        foreach (Body body in bodies)
                         {
-                            foreach (Body body in bodies)
+                            if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
+                                && (mouse.Position.Y - body.Position.Y < 16 && mouse.Position.Y - body.Position.Y > 0))
                             {
-                                if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
-                                    && (mouse.Position.Y - body.Position.Y < 16 && mouse.Position.Y - body.Position.Y > 0))
-                                {
-                                    selected = body;
-                                    isSelected = true;
-                                }
+                                selected = body;
+                                isSelected = true;
                             }
                         }
-                    }
-                    else if (mouseHold == true && mouse.LeftButton == ButtonState.Released)
+                    }  
+                    mouseHold = true;
+                }
+
+                else if (mouse.LeftButton == ButtonState.Released)
+                {
+                    if (shiftMouseHold == true)
                     {
-                        mouseHold = false;
+                        shiftMouseHold = false;
                         Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
 
                         initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
@@ -192,25 +219,32 @@ namespace ProjectRevolution
                         double mass = bodies[1].Mass; // Jordens massa
                         string name = "Planet" + bodies.Count.ToString();
 
-                        Planet rngObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics.GraphicsDevice);
+                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics.GraphicsDevice);
                         Console.WriteLine("Planet added at: " + rngObject.Position);
-                        bodies.Add(rngObject);
-                        planets.Add(rngObject);
-                        spriteCache.Add(rngObject, new List<Vector2>());
+                        bodies.Add(spwnObject);
+                        planets.Add(spwnObject);
+                        spriteCache.Add(spwnObject, new List<Vector2>());
                     }
+                    mouseHold = false;
+                }
 
+                if (!pause)
+                {
                     foreach (Planet planet in planets)
                     {
                         planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
                     }
                 }
+                
                 //Console.WriteLine("Update: " + gameTime.ElapsedGameTime.TotalSeconds.ToString() + "   :   " + IrlTotalUpdateTime(gameTime));
+                
                 base.Update(gameTime);
                 oldTotalUpdateTime = gameTime.TotalGameTime.TotalSeconds;
                 u = 0;
             }
             u += gameTime.ElapsedGameTime.TotalSeconds;
         }
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -225,7 +259,7 @@ namespace ProjectRevolution
                 spriteBatch.Begin();
                 foreach (Body body in bodies)
                 {
-                    if (!body.IsStar)
+                    if (!body.IsStar)   //If the body is a star then it skips the drawing of tail since it is supposed to be stationary
                     {
                         Planet planet = body as Planet;
                         spriteCache[planet].Add(planet.Position);
@@ -245,25 +279,44 @@ namespace ProjectRevolution
                         }
                     }
 
-                    spriteBatch.Draw(body.Texture, body.Position);
+                    //Draws thebody itself
+                    spriteBatch.Draw(body.Texture, body.Position);  
+
+                    //Followed by the marker ontop of the body's sprite id it has been selected
                     if (body == selected)
                     {
                         spriteBatch.Draw(markerSprite, new Vector2(body.Position.X - 3, body.Position.Y - 3));
                     }
                 }
+
+                //Draws the menu's background color
                 spriteBatch.Draw(menuSprite, null, menuBackground);
-                spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
-                double updateTime = IrlTotalUpdateTime(gameTime);
-                if (updateTime != 0)
-                    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / updateTime), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
+
+                //Draw pause button
+                if(pause)
+                {
+                    spriteBatch.Draw(playBtnSprite, null, pauseBtn);
+                }
+                else
+                {
+                    spriteBatch.Draw(pauseBtnSprite, null, pauseBtn);
+                }
                 
 
+                //Draws the debug counter in the top left corner
+                spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
+                double updateTime = IrlTotalUpdateTime(gameTime);
+                if (updateTime != 0)    //Temporary
+                    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / updateTime), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
+                
+                //If it's selected the planets info gets drawn ontop of the menu's background sprite
                 if (isSelected)
                 {
                     // Den horisontella positionen där text skrivs ut i menyn
                     float horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;
                     spriteBatch.Draw(selected.Texture, new Vector2(horizontalTextPosition, 10));
                     spriteBatch.DrawString(arial, selected.Name, new Vector2(horizontalTextPosition + 30, 10), new Color(new Vector3(0, 0, 0)));
+
                     if (!selected.IsStar)
                     {
                         //Acc still does not work properly
@@ -276,6 +329,7 @@ namespace ProjectRevolution
                 }
                 spriteBatch.End();
                 base.Draw(gameTime);
+
                 oldTotalDrawTime = gameTime.TotalGameTime.TotalSeconds;
                 d = 0;
             }
@@ -284,12 +338,26 @@ namespace ProjectRevolution
 
         public double IrlTotalUpdateTime(GameTime gametime)
         {
+            double lol = gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTime;
             return gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTime;
         }
 
         public double IrlTotalDrawTime(GameTime gametime)
         {
             return gametime.TotalGameTime.TotalSeconds - oldTotalDrawTime;
+        }
+
+        public bool IsMouseInArea(MouseState mousestate, Point position, double Height, double Width)
+        {
+            if(mousestate.Position.X > position.X && mousestate.Position.X < position.X + Width 
+                && mousestate.Position.Y > position.Y && mousestate.Position.Y < position.Y + Height)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
