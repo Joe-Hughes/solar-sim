@@ -20,11 +20,15 @@ namespace ProjectRevolution
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
         protected bool isStar = true;
+
+        // Använd jorden som referenspunkt för att få fram meter per positionsenhet. Alltså (Neptunus avstånd från solen i enheter)/(Neptunus avstånd från stolen i meter)
+        private static double referenceDistanceInUnits = 360;
+        private static double referenceDistanceInMeters = 4495.1 * Math.Pow(10, 9);
+        public static double scaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
+        protected double timeSpeed = 5000000;
+
         // Newtons konstant, gäller för alla kroppar med massa
         // enhet: Nm^2/kg^2
-        public static double scaleMultiplier = 1.06857 * Math.Pow(10, 9); // TODO: generera i kod istället för att använda ett arbiträrt nummer
-        protected double timeSpeed = 840000;
-
         protected double gravConstant = 6.67408 * Math.Pow(10, -11);
 
         public Vector2 Position { get { return position; } }
