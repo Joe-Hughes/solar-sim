@@ -79,17 +79,15 @@ namespace ProjectRevolution
                 }
             }
 
-            // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen beräknas utifrån den
+            // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen och beräknas utifrån den
             this.velocity += velocityVector;
 
             this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
             this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
 
             speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
-            acceleration = (speed - oldSpeed) * totalSecondsSinceUpdate; 
+            acceleration = (speed - oldSpeed) * totalSecondsSinceUpdate;
             oldSpeed = speed;
         }
-
-        
     }
 }
