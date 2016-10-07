@@ -24,7 +24,7 @@ namespace ProjectRevolution
         Texture2D txtBoxSprite;
         Texture2D pauseBtnSprite;
         Texture2D playBtnSprite;
-        Rectangle pauseBtn = new Rectangle(700, 526, 100, 50);
+        Rectangle pauseBtn;
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
@@ -35,7 +35,7 @@ namespace ProjectRevolution
         int spriteCacheSize = 900;
         bool pause = false;
         SpriteFont arial;
-        Rectangle menuBackground = new Rectangle(700, 0, 324, 576);
+        Rectangle menuBackground;
         Body selected;
         bool isSelected = false;
 
@@ -51,9 +51,12 @@ namespace ProjectRevolution
             Content.RootDirectory = "Content";
             IsFixedTimeStep = false;    // unlocks framerate
             graphics.SynchronizeWithVerticalRetrace = false;    // disables Vsync
-            graphics.PreferredBackBufferWidth = 1024;  // set this value to the desired width of your window
-            graphics.PreferredBackBufferHeight = 576;   // set this value to the desired height of your window
+            graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window
+            graphics.PreferredBackBufferHeight = 768;   // set this value to the desired height of your window
+            graphics.IsFullScreen = false;
             graphics.ApplyChanges();
+            menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
+            pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
         }
 
         /// <summary>
@@ -95,12 +98,12 @@ namespace ProjectRevolution
             // Create all the bodies in the system; 
             Body sun = new Body(1.99 * Math.Pow(10, 30), 8, graphics.GraphicsDevice, "Sun", starSprite);
             Planet earth = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, -140), "Earth", planetSprite, sun, new Vector2(20000, 0));
-            //Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planetSprite, sun, new Vector2(-20000, 0));
+            // Planet planet2 = new Planet(5.93 * Math.Pow(10, 24), 8, graphics.GraphicsDevice, new Vector2(0, 140), "planet2", planetSprite, sun, new Vector2(-20000, 0));
 
             bodies.Add(sun);
             bodies.Add(earth);
-            //bodies.Add(planet2);
-            //bodies.Add(planet3);
+            // bodies.Add(planet2);
+            // bodies.Add(planet3);
             foreach (Body body in bodies)
             {
                 if (!body.IsStar)
@@ -201,7 +204,6 @@ namespace ProjectRevolution
                         planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
                     }
                 }
-                Console.WriteLine("Update: " + gameTime.ElapsedGameTime.TotalSeconds.ToString() + "   :   " + IrlTotalUpdateTime(gameTime));
                 base.Update(gameTime);
                 oldTotalUpdateTime = gameTime.TotalGameTime.TotalSeconds;
                 u = 0;
@@ -216,7 +218,6 @@ namespace ProjectRevolution
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            
             if (d >= 0.05)
             {
                 //MakeDaPictures
@@ -271,7 +272,7 @@ namespace ProjectRevolution
                 //If it's selected the planets info gets drawn ontop of the menu's background sprite
                 if (isSelected)
                 {
-                    spriteBatch.Draw(selected.Texture, new Vector2(720, 10));
+                    spriteBatch.Draw(selected.Texture, new Vector2(menuBackground.X, 10));
                     spriteBatch.DrawString(arial, selected.Name, new Vector2(770, 10), new Color(new Vector3(0, 0, 0)));
                     if (!selected.IsStar)
                     {
