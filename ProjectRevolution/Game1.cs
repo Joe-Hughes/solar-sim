@@ -220,7 +220,7 @@ namespace ProjectRevolution
                         string name = "Planet" + bodies.Count.ToString();
 
                         Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics.GraphicsDevice);
-                        Console.WriteLine("Planet added at: " + rngObject.Position);
+                        Console.WriteLine("Planet added at: " + spwnObject.Position);
                         bodies.Add(spwnObject);
                         planets.Add(spwnObject);
                         spriteCache.Add(spwnObject, new List<Vector2>());
