@@ -11,17 +11,16 @@ namespace ProjectRevolution
 {
     class Planet : Body
     {
-        private Vector2 velocity;
-        private double acceleration;
-        private double force;
-        private double speed;
-        private double oldSpeed = 0;
-
+        private Vector2 velocity; // Hastigheten i enheter/updatering
+        private double acceleration; // Enhet: meter/(sekund^2)
+        private double force; // Enhet: newton
+        private double speed; // Hastighet i SI-enheter alltså meter/sekund
+        private double oldSpeed = 0; // Används för att beräkna delta-hastighet
 
         public Vector2 Velocity { get { return velocity; } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
-        public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
+        public double Speed { get { return speed; } }
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
             double initialVelocity, Texture2D texture, Body star, GraphicsDevice graphicsDevice)
@@ -36,8 +35,8 @@ namespace ProjectRevolution
             angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
             Console.WriteLine("Multiplied: " + angleVector);
 
-            double posX = GetCenter(graphicsDevice).X - radius + angleVector.X;
-            double posY = GetCenter(graphicsDevice).Y - radius + angleVector.Y;
+            double posX = Game1.GetCenter(graphicsDevice).X - radius + angleVector.X;
+            double posY = Game1.GetCenter(graphicsDevice).Y - radius + angleVector.Y;
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
 
@@ -55,8 +54,8 @@ namespace ProjectRevolution
 
             this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
 
-            double posX = GetCenter(graphicsDevice).X - radius + position.X;
-            double posY = GetCenter(graphicsDevice).Y - radius + position.Y;
+            double posX = Game1.GetCenter(graphicsDevice).X - radius + position.X;
+            double posY = Game1.GetCenter(graphicsDevice).Y - radius + position.Y;
             this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
         }
 
@@ -77,8 +76,6 @@ namespace ProjectRevolution
                     Vector2 direction = new Vector2(Convert.ToSingle(xDistance), Convert.ToSingle(yDistance));
                     direction.Normalize();
 
-                    // TODO prova att ta bort scale multiplier, bör ha samma resultat då man räknar i positioner istället för meter.
-
                     // gravitationslagen F = G * (m*M / r^2)
                     force = this.gravConstant * ((this.mass * otherBody.Mass) / Math.Pow(DetermineDistance(otherBody) * scaleMultiplier, 2));
                     // beräkna accelerationen genom a = F / m
@@ -90,11 +87,9 @@ namespace ProjectRevolution
                     appliedSpeed = (appliedSpeed / scaleMultiplier);
 
                     // Beräknar vektorn i x- och y-led genom att multiplicera riktningen med hastigheten
-                    float xVelocity = Convert.ToSingle(direction.X * appliedSpeed);
-                    float yVelocity = Convert.ToSingle(direction.Y * appliedSpeed);
+                    Vector2 velocity = Vector2.Multiply(direction, new Vector2((float)appliedSpeed));
 
-                    velocityVector.X += xVelocity;
-                    velocityVector.Y += yVelocity;
+                    velocityVector = Vector2.Add(velocityVector, velocity);
                 }
             }
 
@@ -105,7 +100,7 @@ namespace ProjectRevolution
             this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
 
             speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
-            acceleration = (speed - oldSpeed) * totalSecondsSinceUpdate;
+            acceleration = (speed - oldSpeed) / totalSecondsSinceUpdate;
             oldSpeed = speed;
         }
 
