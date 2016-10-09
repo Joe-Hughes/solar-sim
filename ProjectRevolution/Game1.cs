@@ -103,25 +103,25 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics.GraphicsDevice);
             bodies.Add(sun);
 
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics.GraphicsDevice);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics.GraphicsDevice, arial);
             bodies.Add(mercury);
 
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics.GraphicsDevice);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics.GraphicsDevice, arial);
             bodies.Add(earth);
 
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics.GraphicsDevice);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics.GraphicsDevice, arial);
             bodies.Add(mars);
 
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics.GraphicsDevice);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics.GraphicsDevice, arial);
             bodies.Add(jupiter);
 
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics.GraphicsDevice);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics.GraphicsDevice, arial);
             bodies.Add(saturn);
 
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics.GraphicsDevice);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics.GraphicsDevice, arial);
             bodies.Add(uranus);
 
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics.GraphicsDevice);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics.GraphicsDevice, arial);
             bodies.Add(neptune);
 
             foreach (Body body in bodies)
@@ -178,10 +178,7 @@ namespace ProjectRevolution
                             else
                             {
                                 // Ser till att musen inte befinner sig utanför rutan när man droppar in planeter
-                                int x = mouse.Position.X;
-                                int y = mouse.Position.Y;
-                                if (x > 0 && x < (graphics.PreferredBackBufferWidth - menuBackground.Width) &&
-                                    y > 0 && y < graphics.PreferredBackBufferHeight)
+                                if (IsMouseInArea(mouse, new Point(0, 0), graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth - menuBackground.Width))
                                 {
                                     initialPos = mouse.Position.ToVector2();
                                     mouseHold = true;
@@ -219,8 +216,8 @@ namespace ProjectRevolution
                         double mass = bodies[1].Mass; // Jordens massa
                         string name = "Planet" + bodies.Count.ToString();
 
-                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics.GraphicsDevice);
-                        Console.WriteLine("Planet added at: " + rngObject.Position);
+                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics.GraphicsDevice, arial);
+                        Console.WriteLine("Planet added at: " + spwnObject.Position);
                         bodies.Add(spwnObject);
                         planets.Add(spwnObject);
                         spriteCache.Add(spwnObject, new List<Vector2>());
@@ -338,7 +335,6 @@ namespace ProjectRevolution
 
         public double IrlTotalUpdateTime(GameTime gametime)
         {
-            double lol = gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTime;
             return gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTime;
         }
 
@@ -349,15 +345,8 @@ namespace ProjectRevolution
 
         public bool IsMouseInArea(MouseState mousestate, Point position, double Height, double Width)
         {
-            if(mousestate.Position.X > position.X && mousestate.Position.X < position.X + Width 
-                && mousestate.Position.Y > position.Y && mousestate.Position.Y < position.Y + Height)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return mousestate.Position.X > position.X && mousestate.Position.X < position.X + Width
+                && mousestate.Position.Y > position.Y && mousestate.Position.Y < position.Y + Height;
         }
     }
 }

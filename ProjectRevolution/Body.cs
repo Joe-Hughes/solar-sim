@@ -20,6 +20,7 @@ namespace ProjectRevolution
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
         protected bool isStar = true;
+        
 
         // Använd jorden som referenspunkt för att få fram meter per positionsenhet. Alltså (Neptunus avstånd från solen i enheter)/(Neptunus avstånd från stolen i meter)
         private static double referenceDistanceInUnits = 360;
@@ -37,6 +38,7 @@ namespace ProjectRevolution
         public string Name { get { return name; } }
         public double Radius { get { return radius; } }
         public bool IsStar { get { return isStar; } }
+        
 
         // Denna konstruktor används för stjärnor
         public Body(double mass, string name, Texture2D texture, GraphicsDevice graphicsDevice)
