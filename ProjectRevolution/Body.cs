@@ -20,6 +20,8 @@ namespace ProjectRevolution
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
         protected bool isStar = true;
+
+        protected Menu menu;
         
 
         // Använd jorden som referenspunkt för att få fram meter per positionsenhet. Alltså (Neptunus avstånd från solen i enheter)/(Neptunus avstånd från stolen i meter)
@@ -35,22 +37,25 @@ namespace ProjectRevolution
         public Vector2 Position { get { return position; } }
         public double Mass { get { return mass; } }
         public Texture2D Texture { get { return texture; } }
-        public string Name { get { return name; } }
+        public string Name { get { return name; } set { this.name = value; } }
         public double Radius { get { return radius; } }
         public bool IsStar { get { return isStar; } }
+        public double ScaleMultiplier { get { return scaleMultiplier; } }
+        public Menu Menu { get { return menu; } }
         
 
         // Denna konstruktor används för stjärnor
-        public Body(double mass, string name, Texture2D texture, GraphicsDevice graphicsDevice)
+        public Body(double mass, string name, Texture2D texture, GraphicsDeviceManager graphics, SpriteFont font)
         {
             this.mass = mass;
             this.radius = texture.Width / 2;
             this.name = name;
             this.texture = texture;
+            this.menu = new Menu(this, graphics, font);
 
             // Sätter stjärnan i mitten av skärmen genom att ta skärmstorleken och dela på två
-            this.position.X = Convert.ToSingle(GetCenter(graphicsDevice).X - radius);
-            this.position.Y = Convert.ToSingle(GetCenter(graphicsDevice).Y - radius);
+            this.position.X = Convert.ToSingle(GetCenter(graphics.GraphicsDevice).X - radius);
+            this.position.Y = Convert.ToSingle(GetCenter(graphics.GraphicsDevice).Y - radius);
         }
 
         // returnerar distansen mellan denna och en annan kropp genom Pytagoras sats

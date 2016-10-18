@@ -29,6 +29,7 @@ namespace ProjectRevolution
         List<Planet> planets = new List<Planet>();
         bool mouseHold = false;
         bool shiftMouseHold = false;
+        bool takeKeyboardInput = false;
         Vector2 initialPos;
         Vector2 dragVector;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
@@ -97,31 +98,31 @@ namespace ProjectRevolution
             playBtnSprite = this.Content.Load<Texture2D>(@"PlayBtn");
             arial = this.Content.Load<SpriteFont>("StandardArial");
 
-            menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
+            
 
             // Skapar kroppar och lägger in dem i systemet
-            Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics.GraphicsDevice);
+            Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics, arial);
             bodies.Add(sun);
 
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics.GraphicsDevice, arial);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics, arial);
             bodies.Add(mercury);
 
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics.GraphicsDevice, arial);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics, arial);
             bodies.Add(earth);
 
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics.GraphicsDevice, arial);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics, arial);
             bodies.Add(mars);
 
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics.GraphicsDevice, arial);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics, arial);
             bodies.Add(jupiter);
 
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics.GraphicsDevice, arial);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics, arial);
             bodies.Add(saturn);
 
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics.GraphicsDevice, arial);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics, arial);
             bodies.Add(uranus);
 
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics.GraphicsDevice, arial);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics, arial);
             bodies.Add(neptune);
 
             foreach (Body body in bodies)
@@ -151,22 +152,45 @@ namespace ProjectRevolution
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
 
+                KeyboardState keyboard = Keyboard.GetState();
                 MouseState mouse = Mouse.GetState();
+                if (takeKeyboardInput)
+                {
+                    Keys key = readKeyBoard();
+                    if(key == Keys.Back)
+                    {
+
+                    }
+                    else if(key == Keys.Enter)
+                    {
+
+                    }
+
+                }
                 if (mouse.LeftButton == ButtonState.Pressed)
                 { 
-                    if(mouseHold == false && IsMouseInArea(mouse, pauseBtn.Location, pauseBtn.Height, pauseBtn.Width))
+                    if(mouseHold == false)
                     {
-                        if(pause)
+                        if (IsMouseInArea(mouse, pauseBtn.Location, pauseBtn.Height, pauseBtn.Width))
                         {
-                            pause = false;
+                            pause = !pause;
                         }
-                        else
+
+                        else if(isSelected)
                         {
-                            pause = true;
+                            foreach (TextBox textBox in selected.Menu.TxtBoxes)
+                            {
+                                if (IsMouseInArea(mouse, textBox.Hitbox.Location, textBox.Hitbox.Height, textBox.Hitbox.Width))
+                                {
+                                    pause = true;
+                                    takeKeyboardInput = true;
+                                    textBox.Text = "";
+                                }
+                            }
                         }
                     }
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+                    if (keyboard.IsKeyDown(Keys.LeftShift))
                     {
                         if (!pause)
                         {
@@ -216,7 +240,7 @@ namespace ProjectRevolution
                         double mass = bodies[1].Mass; // Jordens massa
                         string name = "Planet" + bodies.Count.ToString();
 
-                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics.GraphicsDevice, arial);
+                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics, arial);
                         Console.WriteLine("Planet added at: " + spwnObject.Position);
                         bodies.Add(spwnObject);
                         planets.Add(spwnObject);
@@ -347,6 +371,11 @@ namespace ProjectRevolution
         {
             return mousestate.Position.X > position.X && mousestate.Position.X < position.X + Width
                 && mousestate.Position.Y > position.Y && mousestate.Position.Y < position.Y + Height;
+        }
+
+        public Keys readKeyBoard()
+        {
+            return Keyboard.GetState().GetPressedKeys()[0];
         }
     }
 }

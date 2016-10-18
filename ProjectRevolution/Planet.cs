@@ -18,21 +18,15 @@ namespace ProjectRevolution
         private double oldSpeed = 0;
         private SpriteFont font;
 
-        private TextBox txtBoxName;
-        private TextBox txtBoxDis;
-        private TextBox txtBoxVel;
-        private TextBox txtBoxAcc;
-        private TextBox txtBoxForce;
-
-        public Vector2 Velocity { get { return velocity; } }
+        public Vector2 Velocity { get { return velocity; } set { } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
         public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
         public SpriteFont Font { get { return font; } }
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
-            double initialVelocity, Texture2D texture, Body star, GraphicsDevice graphicsDevice, SpriteFont font)
-            : base(mass, name, texture, graphicsDevice)
+            double initialVelocity, Texture2D texture, Body star, GraphicsDeviceManager graphics, SpriteFont font)
+            : base(mass, name, texture, graphics, font)
         {
             this.isStar = false;
             this.font = font;
@@ -44,8 +38,8 @@ namespace ProjectRevolution
             angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
             Console.WriteLine("Multiplied: " + angleVector);
 
-            double posX = GetCenter(graphicsDevice).X - radius + angleVector.X;
-            double posY = GetCenter(graphicsDevice).Y - radius + angleVector.Y;
+            double posX = GetCenter(graphics.GraphicsDevice).X - radius + angleVector.X;
+            double posY = GetCenter(graphics.GraphicsDevice).Y - radius + angleVector.Y;
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
 
@@ -54,20 +48,19 @@ namespace ProjectRevolution
             this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
 
             // Skapar all text som komer visas i menyn när denna planet är vald
-
         }
 
         //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
         public Planet(double mass, string name, Vector2 position, Vector2 velocity,
-            Texture2D texture, Body star, GraphicsDevice graphicsDevice, SpriteFont font)
-            : base(mass, name, texture, graphicsDevice)
+            Texture2D texture, Body star, GraphicsDeviceManager graphics, SpriteFont font)
+            : base(mass, name, texture, graphics, font)
         {
             this.isStar = false;
 
             this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
 
-            double posX = GetCenter(graphicsDevice).X - radius + position.X;
-            double posY = GetCenter(graphicsDevice).Y - radius + position.Y;
+            double posX = GetCenter(graphics.GraphicsDevice).X - radius + position.X;
+            double posY = GetCenter(graphics.GraphicsDevice).Y - radius + position.Y;
             this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
         }
 

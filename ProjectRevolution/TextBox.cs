@@ -15,10 +15,13 @@ namespace ProjectRevolution
         protected string text;
         protected SpriteFont font;
         protected Rectangle hitbox;
+        protected bool edit;
 
-        public string Text { get { return text; } }
+        public bool Selected { get { return selected; } set { selected = value; } }
+        public string Text { get { return text; } set { text = value; } }
         public SpriteFont Font { get { return font; } }
         public Rectangle Hitbox { get { return hitbox; } }
+        public bool Edit { get { return edit; } }
 
         public TextBox (string txt, Point position, SpriteFont font)
         {
