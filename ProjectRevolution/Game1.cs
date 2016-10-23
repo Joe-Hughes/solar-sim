@@ -16,6 +16,7 @@ namespace ProjectRevolution
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+
         Texture2D planetSprite;
         Texture2D starSprite;
         Texture2D tailSprite;
@@ -25,20 +26,29 @@ namespace ProjectRevolution
         Texture2D pauseBtnSprite;
         Texture2D playBtnSprite;
         Rectangle pauseBtn;
+
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
+
         bool mouseHold = false;
         bool shiftMouseHold = false;
-        bool takeKeyboardInput = false;
         Vector2 initialPos;
         Vector2 dragVector;
+
+        bool takeKeyboardInput = false;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
         int spriteCacheSize = 3000;
         bool pause = false;
+
         SpriteFont arial;
         Rectangle menuBackground;
-        Body selected;
-        bool isSelected = false;
+        Menu menu;
+        TextBox selectedTxtBox;
+
+        Body selectedBody;
+        bool isSelectedBody = false;
+
+        KbHandler kbHandler = new KbHandler();
 
         double d = 0.02;
         double u = 0.01;
@@ -101,28 +111,28 @@ namespace ProjectRevolution
             
 
             // Skapar kroppar och lägger in dem i systemet
-            Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics, arial);
+            Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
 
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics, arial);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics);
             bodies.Add(mercury);
 
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics, arial);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics);
             bodies.Add(earth);
 
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics, arial);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics);
             bodies.Add(mars);
 
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics, arial);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics);
             bodies.Add(jupiter);
 
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics, arial);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics);
             bodies.Add(saturn);
 
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics, arial);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics);
             bodies.Add(uranus);
 
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics, arial);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics);
             bodies.Add(neptune);
 
             foreach (Body body in bodies)
@@ -156,16 +166,7 @@ namespace ProjectRevolution
                 MouseState mouse = Mouse.GetState();
                 if (takeKeyboardInput)
                 {
-                    Keys key = readKeyBoard();
-                    if(key == Keys.Back)
-                    {
-
-                    }
-                    else if(key == Keys.Enter)
-                    {
-
-                    }
-
+                    kbHandler.Update(menu);
                 }
                 if (mouse.LeftButton == ButtonState.Pressed)
                 { 
@@ -174,11 +175,12 @@ namespace ProjectRevolution
                         if (IsMouseInArea(mouse, pauseBtn.Location, pauseBtn.Height, pauseBtn.Width))
                         {
                             pause = !pause;
+                            menu.UpdateValues();
                         }
 
-                        else if(isSelected)
+                        else if(isSelectedBody)
                         {
-                            foreach (TextBox textBox in selected.Menu.TxtBoxes)
+                            foreach (TextBox textBox in menu.TxtBoxes)
                             {
                                 if (IsMouseInArea(mouse, textBox.Hitbox.Location, textBox.Hitbox.Height, textBox.Hitbox.Width))
                                 {
@@ -188,6 +190,7 @@ namespace ProjectRevolution
                                 }
                             }
                         }
+
                     }
 
                     if (keyboard.IsKeyDown(Keys.LeftShift))
@@ -214,13 +217,14 @@ namespace ProjectRevolution
 
                     else
                     {
+                        menu.UpdateValues();
                         foreach (Body body in bodies)
                         {
                             if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
                                 && (mouse.Position.Y - body.Position.Y < 16 && mouse.Position.Y - body.Position.Y > 0))
                             {
-                                selected = body;
-                                isSelected = true;
+                                selectedBody = body;
+                                isSelectedBody = true;
                             }
                         }
                     }  
@@ -240,7 +244,7 @@ namespace ProjectRevolution
                         double mass = bodies[1].Mass; // Jordens massa
                         string name = "Planet" + bodies.Count.ToString();
 
-                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics, arial);
+                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics);
                         Console.WriteLine("Planet added at: " + spwnObject.Position);
                         bodies.Add(spwnObject);
                         planets.Add(spwnObject);
@@ -304,7 +308,7 @@ namespace ProjectRevolution
                     spriteBatch.Draw(body.Texture, body.Position);  
 
                     //Followed by the marker ontop of the body's sprite id it has been selected
-                    if (body == selected)
+                    if (body == selectedBody)
                     {
                         spriteBatch.Draw(markerSprite, new Vector2(body.Position.X - 3, body.Position.Y - 3));
                     }
@@ -331,18 +335,18 @@ namespace ProjectRevolution
                     spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / updateTime), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
                 
                 //If it's selected the planets info gets drawn ontop of the menu's background sprite
-                if (isSelected)
+                if (isSelectedBody)
                 {
                     // Den horisontella positionen där text skrivs ut i menyn
                     float horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;
-                    spriteBatch.Draw(selected.Texture, new Vector2(horizontalTextPosition, 10));
-                    spriteBatch.DrawString(arial, selected.Name, new Vector2(horizontalTextPosition + 30, 10), new Color(new Vector3(0, 0, 0)));
+                    spriteBatch.Draw(selectedBody.Texture, new Vector2(horizontalTextPosition, 10));
+                    spriteBatch.DrawString(arial, selectedBody.Name, new Vector2(horizontalTextPosition + 30, 10), new Color(new Vector3(0, 0, 0)));
 
-                    if (!selected.IsStar)
+                    if (!selectedBody.IsStar)
                     {
                         //Acc still does not work properly
-                        Planet planet = selected as Planet;
-                        spriteBatch.DrawString(arial, "Distance from sun: " + (selected.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(horizontalTextPosition, 70), new Color(new Vector3(0, 0, 0)));
+                        Planet planet = selectedBody as Planet;
+                        spriteBatch.DrawString(arial, "Distance from sun: " + (selectedBody.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(horizontalTextPosition, 70), new Color(new Vector3(0, 0, 0)));
                         spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(horizontalTextPosition, 110), new Color(new Vector3(0, 0, 0)));
                         spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(horizontalTextPosition, 150), new Color(new Vector3(0, 0, 0)));
                         spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(horizontalTextPosition, 190), new Color(new Vector3(0, 0, 0)));

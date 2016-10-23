@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace ProjectRevolution
 {
-    class TextBox
+    public class TextBox
     {
         protected bool selected;
         protected string text;

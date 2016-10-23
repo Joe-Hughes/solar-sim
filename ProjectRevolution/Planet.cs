@@ -25,11 +25,10 @@ namespace ProjectRevolution
         public SpriteFont Font { get { return font; } }
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
-            double initialVelocity, Texture2D texture, Body star, GraphicsDeviceManager graphics, SpriteFont font)
-            : base(mass, name, texture, graphics, font)
+            double initialVelocity, Texture2D texture, Body star, GraphicsDeviceManager graphics)
+            : base(mass, name, texture, graphics)
         {
             this.isStar = false;
-            this.font = font;
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
@@ -52,8 +51,8 @@ namespace ProjectRevolution
 
         //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
         public Planet(double mass, string name, Vector2 position, Vector2 velocity,
-            Texture2D texture, Body star, GraphicsDeviceManager graphics, SpriteFont font)
-            : base(mass, name, texture, graphics, font)
+            Texture2D texture, Body star, GraphicsDeviceManager graphics)
+            : base(mass, name, texture, graphics)
         {
             this.isStar = false;
 

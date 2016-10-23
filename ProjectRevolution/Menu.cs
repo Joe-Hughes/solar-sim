@@ -19,6 +19,8 @@ namespace ProjectRevolution
         private TextBox txtBoxAcc;
         private TextBox txtBoxForce;
 
+        private TextBox selected;
+
         private Rectangle menuBackground;
         private int horizontalTextPosition;
         private Body body;
@@ -32,6 +34,7 @@ namespace ProjectRevolution
         public TextBox TxtBoxVel { get { return txtBoxVel; } set { txtBoxVel = value; } }
         public TextBox TxtBoxAcc { get { return txtBoxAcc; } set { txtBoxAcc = value; } }
         public TextBox TxtBoxForce { get { return txtBoxForce; } set { txtBoxName = value; } }
+        public TextBox Selected { get { return selected; } set { selected = value; } }
 
         public Menu (Body body, Body sun, GraphicsDeviceManager graphics, SpriteFont font)
         {

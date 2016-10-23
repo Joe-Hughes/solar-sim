@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace ProjectRevolution
 {
-    public class KbHandler
+    class KbHandler
     {
         private Keys[] lastPressedKeys;
 
@@ -18,7 +18,7 @@ namespace ProjectRevolution
             lastPressedKeys = new Keys[0];
         }
 
-        public void Update()
+        public void Update(Menu menu)
         {
             KeyboardState kbState = Keyboard.GetState();
             Keys[] pressedKeys = kbState.GetPressedKeys();
@@ -34,16 +34,27 @@ namespace ProjectRevolution
             foreach (Keys key in pressedKeys)
             {
                 if (!lastPressedKeys.Contains(key))
-                    OnKeyDown(key);
+                    OnKeyDown(key, menu);
             }
 
             //save the currently pressed keys so we can compare on the next update
             lastPressedKeys = pressedKeys;
         }
 
-        private void OnKeyDown(Keys key)
+        private void OnKeyDown(Keys key, Menu menu)
         {
-            //do stuff
+            if (key == Keys.Back)
+            {
+                menu.Selected.Text = menu.Selected.Text.Substring(0, menu.Selected.Text.Length - 1);
+            }
+            else if (key == Keys.Enter)
+            {
+                menu.PushChanges();
+            }
+            else
+            {
+                menu.Selected.Text += key.ToString();
+            }
         }
 
         private void OnKeyUp(Keys key)
