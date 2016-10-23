@@ -24,7 +24,7 @@ namespace ProjectRevolution
         Texture2D txtBoxSprite;
         Texture2D pauseBtnSprite;
         Texture2D playBtnSprite;
-        Rectangle pauseBtn;
+        Button pauseButton;
         SpriteFont arial;
 
         List<Body> bodies = new List<Body>();
@@ -39,6 +39,8 @@ namespace ProjectRevolution
         Vector2 initialPos;
         Vector2 dragVector;
 
+        bool firstUpdate = true;
+
         double drawFrequency;
         double updateFrequency;
 
@@ -47,8 +49,8 @@ namespace ProjectRevolution
         Body selected;
         bool isSelected = false;
 
-        double oldTotalUpdateTime = 0.01;
-        double oldTotalDrawTime = 0.02;
+        double oldTotalUpdateTime;
+        double oldTotalDrawTime;
 
         // Programvariabler
         int spriteCacheSize = 3000;
@@ -80,8 +82,7 @@ namespace ProjectRevolution
             graphics.PreferredBackBufferHeight = windowHeight;   // Spelrutans höjd i pixlar
 
             // Om skärmen är 1366x768, spela i fullskärm, annars, centralisera rutan på skärmen
-            if (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height <= 768 &&
-                GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width <= 1366)
+            if (displayHeight <= 768 && displayWidth <= 1366)
             {
                 graphics.IsFullScreen = true;
             }
@@ -128,7 +129,11 @@ namespace ProjectRevolution
             // Ritar grundläggande UI-element
             int menuWidth = 324;
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - menuWidth, 0, menuWidth, graphics.PreferredBackBufferHeight);
-            pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
+            pauseButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width,
+                graphics.PreferredBackBufferWidth - 50), 100, 50, Button.buttonBehavior.Pause, pauseBtnSprite);
+
+            
+            //pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
 
             // Skapar kroppar och lägger in dem i systemet
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics.GraphicsDevice);
@@ -177,24 +182,20 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
+            // Om det har gått tillräckligt med tid sedan förra RIKTIGA uppdateringen, uppdatera igen
             if (updateFrequency >= (1/preferedUPS))
             { 
+                // Stäng ner programmet om man trycker på tillbaka eller Escape
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
 
                 MouseState mouse = Mouse.GetState();
+                // 
                 if (mouse.LeftButton == ButtonState.Pressed)
-                { 
-                    if(mouseHold == false && IsMouseInArea(mouse, pauseBtn.Location, pauseBtn.Height, pauseBtn.Width))
+                {
+                    if (!mouseHold && IsMouseInArea(mouse, pauseButton.Location, pauseButton.Height, pauseButton.Width))
                     {
-                        if(pause)
-                        {
-                            pause = false;
-                        }
-                        else
-                        {
-                            pause = true;
-                        }
+                        pause = !pause;
                     }
 
                     if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
@@ -259,6 +260,7 @@ namespace ProjectRevolution
                     mouseHold = false;
                 }
 
+                // Om spelet inte är pausat, uppdatera planeternas positioner och värden
                 if (!pause)
                 {
                     foreach (Planet planet in planets)
@@ -322,17 +324,19 @@ namespace ProjectRevolution
 
                 //Draws the menu's background color
                 spriteBatch.Draw(menuSprite, null, menuBackground);
+                Console.WriteLine("Menu: " + menuBackground.Location);
+                Console.WriteLine("Button: " + pauseButton.ButtonArea.Location);
 
                 //Draw pause button
-                if(pause)
+                if (pause)
                 {
-                    spriteBatch.Draw(playBtnSprite, null, pauseBtn);
+                    spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
                 }
                 else
                 {
-                    spriteBatch.Draw(pauseBtnSprite, null, pauseBtn);
+                    spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
                 }
-                
+
 
                 //Draws the debug counter in the top left corner
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
@@ -386,7 +390,7 @@ namespace ProjectRevolution
             return gametime.TotalGameTime.TotalSeconds - oldTotalDrawTime;
         }
 
-        public bool IsMouseInArea(MouseState mousestate, Point position, double Height, double Width)
+        public static bool IsMouseInArea(MouseState mousestate, Point position, double Height, double Width)
         {
             if(mousestate.Position.X > position.X && mousestate.Position.X < position.X + Width 
                 && mousestate.Position.Y > position.Y && mousestate.Position.Y < position.Y + Height)
