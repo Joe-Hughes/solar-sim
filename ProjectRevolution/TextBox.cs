@@ -18,7 +18,15 @@ namespace ProjectRevolution
         protected bool edit;
 
         public bool Selected { get { return selected; } set { selected = value; } }
-        public string Text { get { return text; } set { text = value; } }
+        public string Text {
+            get { return text; }
+            set
+            {
+                text = value;
+                this.hitbox.Width = Convert.ToInt32(font.MeasureString(text).X);
+                this.hitbox.Height = Convert.ToInt32(font.MeasureString(text).Y);
+            }
+        }
         public SpriteFont Font { get { return font; } }
         public Rectangle Hitbox { get { return hitbox; } }
         public bool Edit { get { return edit; } }

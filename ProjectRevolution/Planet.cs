@@ -16,13 +16,11 @@ namespace ProjectRevolution
         private double force;
         private double speed;
         private double oldSpeed = 0;
-        private SpriteFont font;
 
         public Vector2 Velocity { get { return velocity; } set { } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
         public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
-        public SpriteFont Font { get { return font; } }
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
             double initialVelocity, Texture2D texture, Body star, GraphicsDeviceManager graphics)

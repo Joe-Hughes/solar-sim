@@ -35,28 +35,24 @@ namespace ProjectRevolution
         public TextBox TxtBoxAcc { get { return txtBoxAcc; } set { txtBoxAcc = value; } }
         public TextBox TxtBoxForce { get { return txtBoxForce; } set { txtBoxName = value; } }
         public TextBox Selected { get { return selected; } set { selected = value; } }
+        public Body Body { get { return body; } set { this.body = value; } }
 
-        public Menu (Body body, Body sun, GraphicsDeviceManager graphics, SpriteFont font)
+        public Menu(Body sun, GraphicsDeviceManager graphics, SpriteFont font)
         {
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
             horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;
-            this.body = body;
             this.sun = sun;
             this.font = font;
 
             Planet planet = body as Planet;
 
-            this.txtBoxName = new TextBox(planet.Name, new Point(horizontalTextPosition, 10), font);
-            this.txtBoxDis = new TextBox((planet.DetermineDistance(sun) * planet.ScaleMultiplier).ToString(), new Point(horizontalTextPosition, 70), font);
-            this.txtBoxVel = new TextBox(planet.Speed.ToString(), new Point(horizontalTextPosition, 110), font);
-            this.txtBoxAcc = new TextBox(planet.Acceleration.ToString(), new Point(horizontalTextPosition, 150), font);
-            this.txtBoxForce = new TextBox(planet.Force.ToString(), new Point(horizontalTextPosition, 190), font);
+            this.txtBoxName = new TextBox("", new Point(horizontalTextPosition, 10), font);
+            this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition, 70), font);
+            this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition, 110), font);
+            this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition, 150), font);
+            this.txtBoxForce = new TextBox("", new Point(horizontalTextPosition, 190), font);
 
-            this.txtBoxes = new List<TextBox> { this.txtBoxName, this.txtBoxDis, this.txtBoxVel, this.txtBoxAcc, this.txtBoxForce};  
-        }
-         public Menu (Body body, GraphicsDeviceManager graphics, SpriteFont font)
-        {
-            this.txtBoxName = new TextBox(body.Name, new Point(horizontalTextPosition, 10), font);
+            this.txtBoxes = new List<TextBox> { this.txtBoxName, this.txtBoxDis, this.txtBoxVel, this.txtBoxAcc, this.txtBoxForce };
         }
 
         public void DrawStrings(SpriteBatch spriteBatch)
@@ -69,7 +65,7 @@ namespace ProjectRevolution
 
         public void UpdateValues()
         {
-            if (!body.IsStar)
+            if (!this.body.IsStar)
             {
 
                 Planet planet = body as Planet;
@@ -88,7 +84,7 @@ namespace ProjectRevolution
 
         public void PushChanges()
         {
-            if(body.IsStar)
+            if(this.body.IsStar)
             {
                 Planet planet = body as Planet;
 

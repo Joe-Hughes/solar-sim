@@ -135,6 +135,8 @@ namespace ProjectRevolution
             Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics);
             bodies.Add(neptune);
 
+            menu = new Menu(sun, graphics, arial);
+
             foreach (Body body in bodies)
             {
                 if (!body.IsStar)
@@ -187,10 +189,10 @@ namespace ProjectRevolution
                                     pause = true;
                                     takeKeyboardInput = true;
                                     textBox.Text = "";
+                                    menu.Selected = textBox;
                                 }
                             }
                         }
-
                     }
 
                     if (keyboard.IsKeyDown(Keys.LeftShift))
@@ -217,7 +219,6 @@ namespace ProjectRevolution
 
                     else
                     {
-                        menu.UpdateValues();
                         foreach (Body body in bodies)
                         {
                             if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
@@ -225,6 +226,7 @@ namespace ProjectRevolution
                             {
                                 selectedBody = body;
                                 isSelectedBody = true;
+                                menu.Body = body;
                             }
                         }
                     }  
@@ -337,20 +339,22 @@ namespace ProjectRevolution
                 //If it's selected the planets info gets drawn ontop of the menu's background sprite
                 if (isSelectedBody)
                 {
-                    // Den horisontella positionen där text skrivs ut i menyn
-                    float horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;
-                    spriteBatch.Draw(selectedBody.Texture, new Vector2(horizontalTextPosition, 10));
-                    spriteBatch.DrawString(arial, selectedBody.Name, new Vector2(horizontalTextPosition + 30, 10), new Color(new Vector3(0, 0, 0)));
+                    menu.UpdateValues();
+                    menu.DrawStrings(spriteBatch);
+                    //// Den horisontella positionen där text skrivs ut i menyn
+                    //float horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;
+                    //spriteBatch.Draw(selectedBody.Texture, new Vector2(horizontalTextPosition, 10));
+                    //spriteBatch.DrawString(arial, selectedBody.Name, new Vector2(horizontalTextPosition + 30, 10), new Color(new Vector3(0, 0, 0)));
 
-                    if (!selectedBody.IsStar)
-                    {
-                        //Acc still does not work properly
-                        Planet planet = selectedBody as Planet;
-                        spriteBatch.DrawString(arial, "Distance from sun: " + (selectedBody.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(horizontalTextPosition, 70), new Color(new Vector3(0, 0, 0)));
-                        spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(horizontalTextPosition, 110), new Color(new Vector3(0, 0, 0)));
-                        spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(horizontalTextPosition, 150), new Color(new Vector3(0, 0, 0)));
-                        spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(horizontalTextPosition, 190), new Color(new Vector3(0, 0, 0)));
-                    }
+                    //if (!selectedBody.IsStar)
+                    //{
+                    //    //Acc still does not work properly
+                    //    Planet planet = selectedBody as Planet;
+                    //    spriteBatch.DrawString(arial, "Distance from sun: " + (selectedBody.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(horizontalTextPosition, 70), new Color(new Vector3(0, 0, 0)));
+                    //    spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(horizontalTextPosition, 110), new Color(new Vector3(0, 0, 0)));
+                    //    spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(horizontalTextPosition, 150), new Color(new Vector3(0, 0, 0)));
+                    //    spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(horizontalTextPosition, 190), new Color(new Vector3(0, 0, 0)));
+                    //}
                 }
                 spriteBatch.End();
                 base.Draw(gameTime);
