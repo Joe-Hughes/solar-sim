@@ -130,10 +130,7 @@ namespace ProjectRevolution
             int menuWidth = 324;
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - menuWidth, 0, menuWidth, graphics.PreferredBackBufferHeight);
             pauseButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width,
-                graphics.PreferredBackBufferWidth - 50), 100, 50, Button.buttonBehavior.Pause, pauseBtnSprite);
-
-            
-            //pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
+                graphics.PreferredBackBufferHeight - 50), 100, 50, Button.ButtonBehavior.Pause, pauseBtnSprite, playBtnSprite);
 
             // Skapar kroppar och lägger in dem i systemet
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics.GraphicsDevice);
@@ -193,10 +190,8 @@ namespace ProjectRevolution
                 // 
                 if (mouse.LeftButton == ButtonState.Pressed)
                 {
-                    if (!mouseHold && IsMouseInArea(mouse, pauseButton.Location, pauseButton.Height, pauseButton.Width))
-                    {
-                        pause = !pause;
-                    }
+                    // Kollar om man tryckt på pausknappen och sparar sedan resultatet i "paus"-variabeln
+                    pause = pauseButton.CheckClick(mouse, mouseHold, pause);
 
                     if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
                     {
@@ -312,10 +307,10 @@ namespace ProjectRevolution
                         }
                     }
 
-                    //Draws thebody itself
+                    //Draws the body itself
                     spriteBatch.Draw(body.Texture, body.Position);  
 
-                    //Followed by the marker ontop of the body's sprite id it has been selected
+                    //Followed by the marker on top of the body's sprite id it has been selected
                     if (body == selected)
                     {
                         spriteBatch.Draw(markerSprite, new Vector2(body.Position.X - 3, body.Position.Y - 3));
@@ -325,18 +320,10 @@ namespace ProjectRevolution
                 //Draws the menu's background color
                 spriteBatch.Draw(menuSprite, null, menuBackground);
                 Console.WriteLine("Menu: " + menuBackground.Location);
-                Console.WriteLine("Button: " + pauseButton.ButtonArea.Location);
+                Console.WriteLine("Button: " + pauseButton.ButtonArea.Location.ToVector2());
 
                 //Draw pause button
-                if (pause)
-                {
-                    spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
-                }
-                else
-                {
-                    spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
-                }
-
+                spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
 
                 //Draws the debug counter in the top left corner
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));

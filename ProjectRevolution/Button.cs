@@ -15,35 +15,20 @@ namespace ProjectRevolution
         private Texture2D texture1;
         private Texture2D texture2;
         private Texture2D activeTexture;
-        private buttonBehavior behavior;
+        private ButtonBehavior behavior;
 
         public Point Location { get { return buttonArea.Location; } }
         public Rectangle ButtonArea { get { return buttonArea; } }
         public int Height { get { return buttonArea.Height; } }
         public int Width { get { return buttonArea.Width; } }
-        public Texture2D Texture
-        {
-            get
-            {
-                if (activeTexture == texture1)
-                {
-                    activeTexture = texture2;
-                    return texture1;
-                }
-                else
-                {
-                    activeTexture = texture1;
-                    return texture2;
-                }
-            }
-        }
+        public Texture2D Texture { get { return activeTexture; } }
 
-        public enum buttonBehavior
+        public enum ButtonBehavior
         {
             Pause
         };
 
-        public Button(Vector2 position, int width, int height, buttonBehavior behavior, Texture2D buttonTexture, 
+        public Button(Vector2 position, int width, int height, ButtonBehavior behavior, Texture2D buttonTexture, 
             Texture2D toggleTexture=null)
         {
             this.buttonArea.Width = width;
@@ -51,11 +36,26 @@ namespace ProjectRevolution
             this.buttonArea.Location = position.ToPoint();
             this.behavior = behavior;
             this.texture1 = buttonTexture;
-            this.texture2 = buttonTexture;
-            //if (toggleTexture != null)
-            //{
-            //    texture2 = toggleTexture;
-            //}
+            if (toggleTexture != null)
+            {
+                texture2 = toggleTexture;
+            }
+            this.activeTexture = texture1;
+        }
+
+        void ToggleTexture()
+        {
+            if (texture2 != null)
+            {
+                if (activeTexture == texture1)
+                {
+                    activeTexture = texture2;
+                }
+                else
+                {
+                    activeTexture = texture1;
+                }
+            }
         }
 
         // click for Pause behavior
@@ -64,6 +64,7 @@ namespace ProjectRevolution
             if (!mouseHold && Game1.IsMouseInArea(mouse, buttonArea.Location, buttonArea.Height, buttonArea.Width))
             {
                 pause = !pause;
+                ToggleTexture();
             }
             return pause;
         }
