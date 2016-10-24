@@ -26,7 +26,7 @@ namespace ProjectRevolution
         // Planet: Nepunus
         public static double scaleMultiplier = Game1.referenceDistanceInMeters / Game1.referenceDistanceInUnits;
 
-        protected double timeSpeed = 1000000;
+        protected double timeSpeed = 9000000;
 
         // Newtons konstant, gäller för alla kroppar med massa
         // enhet: Nm^2/kg^2

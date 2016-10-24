@@ -29,7 +29,6 @@ namespace ProjectRevolution
 
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
-        Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
 
         public static double referenceDistanceInUnits;
         public static double referenceDistanceInMeters;
@@ -53,7 +52,6 @@ namespace ProjectRevolution
         double oldTotalDrawTime;
 
         // Programvariabler
-        int spriteCacheSize = 3000;
         double preferedFPS = 60;
         double preferedUPS = 2 * 60;
 
@@ -136,25 +134,25 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics.GraphicsDevice);
             bodies.Add(sun);
 
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics.GraphicsDevice);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, tailSprite, sun, graphics.GraphicsDevice);
             bodies.Add(mercury);
 
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics.GraphicsDevice);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, tailSprite, sun, graphics.GraphicsDevice);
             bodies.Add(earth);
 
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics.GraphicsDevice);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, tailSprite, sun, graphics.GraphicsDevice);
             bodies.Add(mars);
 
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics.GraphicsDevice);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, tailSprite, sun, graphics.GraphicsDevice);
             bodies.Add(jupiter);
 
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics.GraphicsDevice);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, tailSprite, sun, graphics.GraphicsDevice);
             bodies.Add(saturn);
 
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics.GraphicsDevice);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, tailSprite, sun, graphics.GraphicsDevice);
             bodies.Add(uranus);
 
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics.GraphicsDevice);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, tailSprite, sun, graphics.GraphicsDevice);
             bodies.Add(neptune);
 
             foreach (Body body in bodies)
@@ -163,7 +161,6 @@ namespace ProjectRevolution
                 {
                     Planet planet = body as Planet;
                     planets.Add(planet);
-                    spriteCache.Add(planet, new List<Vector2>());
                 }
             }
         }
@@ -250,7 +247,6 @@ namespace ProjectRevolution
                         Console.WriteLine("Planet added at: " + spwnObject.Position);
                         bodies.Add(spwnObject);
                         planets.Add(spwnObject);
-                        spriteCache.Add(spwnObject, new List<Vector2>());
                     }
                     mouseHold = false;
                 }
@@ -261,6 +257,7 @@ namespace ProjectRevolution
                     foreach (Planet planet in planets)
                     {
                         planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                        planet.Tail.AddTailPosition(planet);
                     }
                 }
                 
@@ -287,51 +284,46 @@ namespace ProjectRevolution
                 spriteBatch.Begin();
                 foreach (Body body in bodies)
                 {
-                    if (!body.IsStar)   //If the body is a star then it skips the drawing of tail since it is supposed to be stationary
+                    // Ritar ut tails för alla planeter
+                    if (!body.IsStar)
                     {
                         Planet planet = body as Planet;
-                        spriteCache[planet].Add(planet.Position);
+                        Tail tail = planet.Tail;
                         // DEBUG
                         //if (planet.Name == "Neptune")
                         //{
                         //    Vector2 center = Game1.GetCenter(graphics.GraphicsDevice);
                         //    Console.WriteLine(planet.Name + " X: " + (planet.Position.X - center.X + planet.radius) + " Y: " + (planet.Position.Y - center.Y + planet.radius));
                         //}
-                        if (spriteCache[planet].Count >= spriteCacheSize)
+                        foreach (Vector2 position in tail.GetTailPositions())
                         {
-                            spriteCache[planet].RemoveAt(0);
-                        }
-                        foreach (Vector2 position in spriteCache[planet])
-                        {
-                            spriteBatch.Draw(tailSprite, position);
+                            spriteBatch.Draw(tail.Texture, position);
                         }
                     }
 
-                    //Draws the body itself
+                    // Ritar själva kroppen
                     spriteBatch.Draw(body.Texture, body.Position);  
 
-                    //Followed by the marker on top of the body's sprite id it has been selected
+                    // Ritar markören om kroppe är markerad
                     if (body == selected)
                     {
                         spriteBatch.Draw(markerSprite, new Vector2(body.Position.X - 3, body.Position.Y - 3));
                     }
                 }
 
-                //Draws the menu's background color
+                // Ritar menyns bakgrundsfärg
                 spriteBatch.Draw(menuSprite, null, menuBackground);
-                Console.WriteLine("Menu: " + menuBackground.Location);
-                Console.WriteLine("Button: " + pauseButton.ButtonArea.Location.ToVector2());
 
-                //Draw pause button
+                // Ritar pausknappen
                 spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
 
-                //Draws the debug counter in the top left corner
+                // Ritar debugmätarna för FPS och UPS
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
                 double updateTime = IrlTotalUpdateTime(gameTime);
                 if (updateTime != 0)    //Temporary
                     spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / updateTime), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
                 
-                //If it's selected the planets info gets drawn ontop of the menu's background sprite
+                // Fyller menyn med information om den valda planeten
                 if (isSelected)
                 {
                     // Den horisontella positionen där text skrivs ut i menyn

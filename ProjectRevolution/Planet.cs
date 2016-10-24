@@ -16,17 +16,20 @@ namespace ProjectRevolution
         private double force; // Enhet: newton
         private double speed; // Hastighet i SI-enheter alltså meter/sekund
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
+        private Tail tail;
 
         public Vector2 Velocity { get { return velocity; } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
         public double Speed { get { return speed; } }
+        public Tail Tail { get { return tail; } }
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
-            double initialVelocity, Texture2D texture, Body star, GraphicsDevice graphicsDevice)
+            double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDevice graphicsDevice)
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
+            tail = new Tail(tailTexture, 30, graphicsDevice); // Tar bort tails efter 90 grader
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
@@ -115,7 +118,8 @@ namespace ProjectRevolution
         public static float VectorToAngle(Vector2 vector)
         {
             double radians = Math.Atan2(vector.X, -vector.Y);
-            return (float)(radians * (Math.PI / 180));
+            double degrees = (radians * (180 / Math.PI));
+            return (float)degrees;
         }
     }
 }
