@@ -46,7 +46,10 @@ namespace ProjectRevolution
         {
             if (key == Keys.Back)
             {
-                menu.Selected.Text = menu.Selected.Text.Substring(0, menu.Selected.Text.Length - 1);
+                if (menu.Selected.Text.Length > 0)
+                {
+                    menu.Selected.Text = menu.Selected.Text.Substring(0, menu.Selected.Text.Length - 1);
+                }
             }
             else if (key == Keys.Enter)
             {

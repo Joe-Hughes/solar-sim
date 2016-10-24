@@ -35,6 +35,8 @@ namespace ProjectRevolution
             angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
             Console.WriteLine("Multiplied: " + angleVector);
 
+            this.radius = texture.Width / 2;
+
             double posX = GetCenter(graphics.GraphicsDevice).X - radius + angleVector.X;
             double posY = GetCenter(graphics.GraphicsDevice).Y - radius + angleVector.Y;
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
@@ -56,6 +58,8 @@ namespace ProjectRevolution
 
             this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
 
+            this.radius = texture.Width / 2;
+
             double posX = GetCenter(graphics.GraphicsDevice).X - radius + position.X;
             double posY = GetCenter(graphics.GraphicsDevice).Y - radius + position.Y;
             this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
@@ -72,8 +76,8 @@ namespace ProjectRevolution
                 {
 
                     // radien behöver adderas på båda distanserna då positionen tas från det över vänstra hörnet av kroppen.
-                    double xDistance = (otherBody.Position.X + otherBody.radius) - (this.position.X + otherBody.radius);
-                    double yDistance = (otherBody.Position.Y + otherBody.radius) - (this.position.Y + otherBody.radius);
+                    double xDistance = (otherBody.Position.X + otherBody.radius) - (this.position.X + radius);
+                    double yDistance = (otherBody.Position.Y + otherBody.radius) - (this.position.Y + radius);
 
                     Vector2 direction = new Vector2(Convert.ToSingle(xDistance), Convert.ToSingle(yDistance));
                     direction.Normalize();

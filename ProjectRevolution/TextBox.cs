@@ -31,7 +31,7 @@ namespace ProjectRevolution
         public Rectangle Hitbox { get { return hitbox; } }
         public bool Edit { get { return edit; } }
 
-        public TextBox (string txt, Point position, SpriteFont font)
+        public TextBox (string txt, Point position, SpriteFont font, bool edit)
         {
             this.text = txt;
             this.font = font;
@@ -39,6 +39,7 @@ namespace ProjectRevolution
             this.hitbox.Y = position.Y;
             this.hitbox.Width = Convert.ToInt32(font.MeasureString(txt).X);
             this.hitbox.Height = Convert.ToInt32(font.MeasureString(txt).Y);
+            this.edit = edit;
         }
     }
 }

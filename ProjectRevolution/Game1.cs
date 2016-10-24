@@ -64,7 +64,7 @@ namespace ProjectRevolution
             graphics.SynchronizeWithVerticalRetrace = false;    // disables Vsync
             graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window
             graphics.PreferredBackBufferHeight = 768;   // set this value to the desired height of your window
-            graphics.IsFullScreen = true;
+            graphics.IsFullScreen = false;
             graphics.ApplyChanges();
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
             pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
@@ -98,8 +98,13 @@ namespace ProjectRevolution
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Loads all the sprites needed
-            planetSprite = this.Content.Load<Texture2D>(@"CIRCLE");
             starSprite = this.Content.Load<Texture2D>(@"STAR");
+            planetSprite = this.Content.Load<Texture2D>(@"earth");
+            Texture2D earthSprite = this.Content.Load<Texture2D>(@"earth");
+            Texture2D marsSprite = this.Content.Load<Texture2D>(@"mars");
+            Texture2D mercurySprite = this.Content.Load<Texture2D>(@"mercury");
+            Texture2D jupiterSprite = this.Content.Load<Texture2D>(@"jupiter");
+
             tailSprite = this.Content.Load<Texture2D>(@"TAIL");
             menuSprite = this.Content.Load<Texture2D>(@"MENU");
             markerSprite = this.Content.Load<Texture2D>(@"MARKER");
@@ -114,16 +119,16 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
 
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, planetSprite, sun, graphics);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, mercurySprite, sun, graphics);
             bodies.Add(mercury);
 
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, planetSprite, sun, graphics);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, earthSprite, sun, graphics);
             bodies.Add(earth);
 
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, planetSprite, sun, graphics);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, marsSprite, sun, graphics);
             bodies.Add(mars);
 
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, planetSprite, sun, graphics);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, jupiterSprite, sun, graphics);
             bodies.Add(jupiter);
 
             Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics);
@@ -222,8 +227,8 @@ namespace ProjectRevolution
                     {
                         foreach (Body body in bodies)
                         {
-                            if ((mouse.Position.X - body.Position.X < 16 && mouse.Position.X - body.Position.X > 0)
-                                && (mouse.Position.Y - body.Position.Y < 16 && mouse.Position.Y - body.Position.Y > 0))
+                            if ((mouse.Position.X - body.Position.X < body.radius * 2 && mouse.Position.X - body.Position.X > 0)
+                                && (mouse.Position.Y - body.Position.Y < body.radius * 2 && mouse.Position.Y - body.Position.Y > 0))
                             {
                                 selectedBody = body;
                                 isSelectedBody = true;
@@ -256,13 +261,13 @@ namespace ProjectRevolution
                     mouseHold = false;
                 }
 
-                if (!pause)
-                {
-                    foreach (Planet planet in planets)
-                    {
-                        planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
-                    }
-                }
+                //if (!pause)
+                //{
+                //    foreach (Planet planet in planets)
+                //    {
+                //        planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                //    }
+                //}
                 
                 //Console.WriteLine("Update: " + gameTime.ElapsedGameTime.TotalSeconds.ToString() + "   :   " + IrlTotalUpdateTime(gameTime));
                 
@@ -291,12 +296,6 @@ namespace ProjectRevolution
                     {
                         Planet planet = body as Planet;
                         spriteCache[planet].Add(planet.Position);
-                        // DEBUG
-                        //if (planet.Name == "Neptune")
-                        //{
-                        //    Vector2 center = Body.GetCenter(graphics.GraphicsDevice);
-                        //    Console.WriteLine(planet.Name + " X: " + (planet.Position.X - center.X + planet.radius) + " Y: " + (planet.Position.Y - center.Y + planet.radius));
-                        //}
                         if (spriteCache[planet].Count >= spriteCacheSize)
                         {
                             spriteCache[planet].RemoveAt(0);
@@ -349,20 +348,6 @@ namespace ProjectRevolution
                         menu.UpdateValues();
                     }
                     menu.DrawStrings(spriteBatch);
-                    //// Den horisontella positionen där text skrivs ut i menyn
-                    //float horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;
-                    //spriteBatch.Draw(selectedBody.Texture, new Vector2(horizontalTextPosition, 10));
-                    //spriteBatch.DrawString(arial, selectedBody.Name, new Vector2(horizontalTextPosition + 30, 10), new Color(new Vector3(0, 0, 0)));
-
-                    //if (!selectedBody.IsStar)
-                    //{
-                    //    //Acc still does not work properly
-                    //    Planet planet = selectedBody as Planet;
-                    //    spriteBatch.DrawString(arial, "Distance from sun: " + (selectedBody.DetermineDistance(bodies[0]) * Body.scaleMultiplier), new Vector2(horizontalTextPosition, 70), new Color(new Vector3(0, 0, 0)));
-                    //    spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(horizontalTextPosition, 110), new Color(new Vector3(0, 0, 0)));
-                    //    spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(horizontalTextPosition, 150), new Color(new Vector3(0, 0, 0)));
-                    //    spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(horizontalTextPosition, 190), new Color(new Vector3(0, 0, 0)));
-                    //}
                 }
                 spriteBatch.End();
                 base.Draw(gameTime);

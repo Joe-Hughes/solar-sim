@@ -46,11 +46,11 @@ namespace ProjectRevolution
 
             Planet planet = body as Planet;
 
-            this.txtBoxName = new TextBox("", new Point(horizontalTextPosition, 10), font);
-            this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition, 70), font);
-            this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition, 110), font);
-            this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition, 150), font);
-            this.txtBoxForce = new TextBox("", new Point(horizontalTextPosition, 190), font);
+            this.txtBoxName = new TextBox("", new Point(horizontalTextPosition, 10), font, false);
+            this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition, 70), font, false);
+            this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition, 110), font, true);
+            this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition, 150), font, true);
+            this.txtBoxForce = new TextBox("", new Point(horizontalTextPosition, 190), font, false);
 
             this.txtBoxes = new List<TextBox> { this.txtBoxName, this.txtBoxDis, this.txtBoxVel, this.txtBoxAcc, this.txtBoxForce };
         }
