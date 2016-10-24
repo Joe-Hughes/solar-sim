@@ -84,7 +84,7 @@ namespace ProjectRevolution
 
         public void PushChanges()
         {
-            if(this.body.IsStar)
+            if(!this.body.IsStar)
             {
                 Planet planet = body as Planet;
 

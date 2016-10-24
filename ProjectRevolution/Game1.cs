@@ -53,8 +53,8 @@ namespace ProjectRevolution
         double d = 0.02;
         double u = 0.01;
 
-        double oldTotalUpdateTime = 0.01;
-        double oldTotalDrawTime = 0.02;
+        double oldTotalUpdateTime = 0;
+        double oldTotalDrawTime = 0;
 
         public Game1()
         {
@@ -64,7 +64,7 @@ namespace ProjectRevolution
             graphics.SynchronizeWithVerticalRetrace = false;    // disables Vsync
             graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window
             graphics.PreferredBackBufferHeight = 768;   // set this value to the desired height of your window
-            graphics.IsFullScreen = false;
+            graphics.IsFullScreen = true;
             graphics.ApplyChanges();
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
             pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
@@ -159,7 +159,7 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
-            if (u >= 0.01)
+            if (IrlTotalUpdateTime(gameTime) >= 0.01)
             { 
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
@@ -178,6 +178,7 @@ namespace ProjectRevolution
                         {
                             pause = !pause;
                             menu.UpdateValues();
+                            takeKeyboardInput = false;
                         }
 
                         else if(isSelectedBody)
@@ -279,7 +280,7 @@ namespace ProjectRevolution
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            if (d >= 0.0167)
+            if (IrlTotalDrawTime(gameTime) >= 0.0167)
             {
                 //MakeDaPictures
                 graphics.GraphicsDevice.Clear(Color.Black);
@@ -332,6 +333,10 @@ namespace ProjectRevolution
 
                 //Draws the debug counter in the top left corner
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
+                if(1/ IrlTotalDrawTime(gameTime) > 100)
+                {
+                    Console.WriteLine(IrlTotalDrawTime(gameTime));
+                }
                 double updateTime = IrlTotalUpdateTime(gameTime);
                 if (updateTime != 0)    //Temporary
                     spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / updateTime), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
@@ -339,7 +344,10 @@ namespace ProjectRevolution
                 //If it's selected the planets info gets drawn ontop of the menu's background sprite
                 if (isSelectedBody)
                 {
-                    menu.UpdateValues();
+                    if (!pause)
+                    {
+                        menu.UpdateValues();
+                    }
                     menu.DrawStrings(spriteBatch);
                     //// Den horisontella positionen där text skrivs ut i menyn
                     //float horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;

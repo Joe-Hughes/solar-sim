@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -53,7 +54,13 @@ namespace ProjectRevolution
             }
             else
             {
-                menu.Selected.Text += key.ToString();
+                string rxPattern = @"D\d";
+                Regex rx = new Regex(rxPattern);
+                if (rx.IsMatch(key.ToString()))
+                {
+                    string result = key.ToString().Substring(1);
+                    menu.Selected.Text += result;
+                }
             }
         }
 
