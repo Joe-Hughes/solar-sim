@@ -69,10 +69,14 @@ namespace ProjectRevolution
             Vector2 radiusLength = new Vector2(planetRadius);
             Vector2 planetMiddlePosition = Vector2.Add(position, radiusLength) - screenCenter;
             Vector2 comparisonMiddlePosition = Vector2.Add(tailPositions[0], radiusLength) - screenCenter;
-            double planetAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(planetMiddlePosition)));
-            double comparisonAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(comparisonMiddlePosition)));
+            //double planetAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(planetMiddlePosition)));
+            //double comparisonAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(comparisonMiddlePosition)));
+            float planetAngle = Planet.VectorToAngle(planetMiddlePosition);
+            float comparisonAngle = Planet.VectorToAngle(comparisonMiddlePosition);
 
-            if (comparisonAngle - planetAngle <= fadeDegree)
+            double angleDifference = Math.Ceiling(180 - Math.Abs(Math.Abs(comparisonAngle - planetAngle) - 180));
+
+            if (angleDifference < fadeDegree)
             {
                 return false;
             }
