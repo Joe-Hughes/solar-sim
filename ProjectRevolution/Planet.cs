@@ -29,7 +29,7 @@ namespace ProjectRevolution
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
-            tail = new Tail(tailTexture, 30, graphicsDevice); // Tar bort tails efter 90 grader
+            tail = new Tail(this.name, texture.Width/2, tailTexture, 90, graphicsDevice); // Tar bort tails efter 90 grader
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
@@ -117,7 +117,7 @@ namespace ProjectRevolution
         // Konverterar en position i enhetscirkeln till motsvarande vinkel i grader.
         public static float VectorToAngle(Vector2 vector)
         {
-            double radians = Math.Atan2(vector.X, -vector.Y);
+            double radians = Math.Atan2(-vector.Y, vector.X);
             double degrees = (radians * (180 / Math.PI));
             return (float)degrees;
         }

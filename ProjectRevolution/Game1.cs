@@ -82,7 +82,8 @@ namespace ProjectRevolution
             // Om skärmen är 1366x768, spela i fullskärm, annars, centralisera rutan på skärmen
             if (displayHeight <= 768 && displayWidth <= 1366)
             {
-                graphics.IsFullScreen = true;
+                graphics.IsFullScreen = false;
+                this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
             }
             else
             {
@@ -97,7 +98,7 @@ namespace ProjectRevolution
             // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
             // Planet: Nepunus
             referenceDistanceInUnits = (graphics.PreferredBackBufferHeight / 2) - 10;
-            referenceDistanceInMeters = 4495.1 * Math.Pow(10, 9);
+            referenceDistanceInMeters = 1433.5 * Math.Pow(10, 9);
 
             drawFrequency = 1 / preferedFPS; // brukade vara 0.02
             updateFrequency = 1 / preferedUPS; // brukade vara 0.01
@@ -338,6 +339,7 @@ namespace ProjectRevolution
                         spriteBatch.DrawString(arial, "Velocity: " + planet.Speed, new Vector2(horizontalTextPosition, 110), new Color(new Vector3(0, 0, 0)));
                         spriteBatch.DrawString(arial, "Acceleration: " + planet.Acceleration, new Vector2(horizontalTextPosition, 150), new Color(new Vector3(0, 0, 0)));
                         spriteBatch.DrawString(arial, "Force: " + planet.Force, new Vector2(horizontalTextPosition, 190), new Color(new Vector3(0, 0, 0)));
+                        spriteBatch.DrawString(arial, "Position: " + planet.Position, new Vector2(horizontalTextPosition, 230), new Color(new Vector3(0, 0, 0)));
                     }
                 }
                 spriteBatch.End();
@@ -352,7 +354,7 @@ namespace ProjectRevolution
         public static Vector2 GetCenter(GraphicsDevice graphicsDevice)
         {
             Point window = graphicsDevice.PresentationParameters.Bounds.Center;
-            window.X -= 162;
+            window.X -= 324 / 2;
             Vector2 center = window.ToVector2();
 
             return center;

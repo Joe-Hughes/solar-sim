@@ -11,6 +11,8 @@ namespace ProjectRevolution
 {
     class Tail
     {
+        string planetName;
+        int planetRadius;
         List<Vector2> tailPositions = new List<Vector2>();
         Texture2D tailSprite;
         // antalet grader runt stjärnan som man vill att det ska kvarstå en tail
@@ -21,8 +23,10 @@ namespace ProjectRevolution
 
         public Texture2D Texture { get { return tailSprite; } }
 
-        public Tail(Texture2D sprite, int? fadeDegree, GraphicsDevice gd)
+        public Tail(string planetName, int planetRadius, Texture2D sprite, int? fadeDegree, GraphicsDevice gd)
         {
+            this.planetName = planetName;
+            this.planetRadius = planetRadius;
             this.tailSprite = sprite;
             this.fadeDegree = fadeDegree;
             this.screenCenter = Game1.GetCenter(gd);
@@ -43,7 +47,7 @@ namespace ProjectRevolution
                 {
                     if (isPositionOutOfBounds(tailPositions[i]))
                     {
-                        tailPositions.RemoveAt(i);
+                        tailPositions.RemoveAt(0);
                     }
                     else
                     {
@@ -62,13 +66,13 @@ namespace ProjectRevolution
             {
                 return false;
             }
-            Vector2 planetMiddlePosition = screenCenter + position;
-            Vector2 comparisonMiddlePosition = screenCenter + tailPositions[0];
-            float planetAngle = Planet.VectorToAngle(planetMiddlePosition);
-            float comparisonAngle = Planet.VectorToAngle(comparisonMiddlePosition);
-            //Console.WriteLine("PlanetAngle:" + planetAngle);
-            //Console.WriteLine("ComparisonAngle" + comparisonAngle);
-            if ((comparisonAngle - planetAngle) <= fadeDegree)
+            Vector2 radiusLength = new Vector2(planetRadius);
+            Vector2 planetMiddlePosition = Vector2.Add(position, radiusLength) - screenCenter;
+            Vector2 comparisonMiddlePosition = Vector2.Add(tailPositions[0], radiusLength) - screenCenter;
+            double planetAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(planetMiddlePosition)));
+            double comparisonAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(comparisonMiddlePosition)));
+
+            if (comparisonAngle - planetAngle <= fadeDegree)
             {
                 return false;
             }
