@@ -37,8 +37,8 @@ namespace ProjectRevolution
 
             this.radius = texture.Width / 2;
 
-            double posX = GetCenter(graphics.GraphicsDevice).X - radius + angleVector.X;
-            double posY = GetCenter(graphics.GraphicsDevice).Y - radius + angleVector.Y;
+            double posX = GetCenter(graphics.GraphicsDevice).X - star.radius + angleVector.X;
+            double posY = GetCenter(graphics.GraphicsDevice).Y - star.radius + angleVector.Y;
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
 
@@ -60,8 +60,8 @@ namespace ProjectRevolution
 
             this.radius = texture.Width / 2;
 
-            double posX = GetCenter(graphics.GraphicsDevice).X - radius + position.X;
-            double posY = GetCenter(graphics.GraphicsDevice).Y - radius + position.Y;
+            double posX = GetCenter(graphics.GraphicsDevice).X - star.radius + position.X;
+            double posY = GetCenter(graphics.GraphicsDevice).Y - star.radius + position.Y;
             this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
         }
 
@@ -76,8 +76,8 @@ namespace ProjectRevolution
                 {
 
                     // radien behöver adderas på båda distanserna då positionen tas från det över vänstra hörnet av kroppen.
-                    double xDistance = (otherBody.Position.X + otherBody.radius) - (this.position.X + radius);
-                    double yDistance = (otherBody.Position.Y + otherBody.radius) - (this.position.Y + radius);
+                    double xDistance = (otherBody.Position.X + otherBody.radius) - (this.position.X + this.radius);
+                    double yDistance = (otherBody.Position.Y + otherBody.radius) - (this.position.Y + this.radius);
 
                     Vector2 direction = new Vector2(Convert.ToSingle(xDistance), Convert.ToSingle(yDistance));
                     direction.Normalize();
@@ -106,8 +106,8 @@ namespace ProjectRevolution
             // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen och beräknas utifrån den
             this.velocity += velocityVector;
 
-            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
-            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
+            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
 
             speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
             acceleration = (speed - oldSpeed) * totalSecondsSinceUpdate;

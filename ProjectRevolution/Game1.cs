@@ -64,7 +64,7 @@ namespace ProjectRevolution
             graphics.SynchronizeWithVerticalRetrace = false;    // disables Vsync
             graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window
             graphics.PreferredBackBufferHeight = 768;   // set this value to the desired height of your window
-            graphics.IsFullScreen = false;
+            graphics.IsFullScreen = true;
             graphics.ApplyChanges();
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
             pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
@@ -104,6 +104,9 @@ namespace ProjectRevolution
             Texture2D marsSprite = this.Content.Load<Texture2D>(@"mars");
             Texture2D mercurySprite = this.Content.Load<Texture2D>(@"mercury");
             Texture2D jupiterSprite = this.Content.Load<Texture2D>(@"jupiter");
+            Texture2D neptunusSprite = this.Content.Load<Texture2D>(@"neptunus");
+            Texture2D saturnusSprite = this.Content.Load<Texture2D>(@"saturnus");
+            Texture2D uranusSprite = this.Content.Load<Texture2D>(@"uranus");
 
             tailSprite = this.Content.Load<Texture2D>(@"TAIL");
             menuSprite = this.Content.Load<Texture2D>(@"MENU");
@@ -131,13 +134,13 @@ namespace ProjectRevolution
             Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, jupiterSprite, sun, graphics);
             bodies.Add(jupiter);
 
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, planetSprite, sun, graphics);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, saturnusSprite, sun, graphics);
             bodies.Add(saturn);
 
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, planetSprite, sun, graphics);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, uranusSprite, sun, graphics);
             bodies.Add(uranus);
 
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, planetSprite, sun, graphics);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, neptunusSprite, sun, graphics);
             bodies.Add(neptune);
 
             menu = new Menu(sun, graphics, arial);
@@ -261,16 +264,16 @@ namespace ProjectRevolution
                     mouseHold = false;
                 }
 
-                //if (!pause)
-                //{
-                //    foreach (Planet planet in planets)
-                //    {
-                //        planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
-                //    }
-                //}
-                
+                if (!pause)
+                {
+                    foreach (Planet planet in planets)
+                    {
+                        planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                    }
+                }
+
                 //Console.WriteLine("Update: " + gameTime.ElapsedGameTime.TotalSeconds.ToString() + "   :   " + IrlTotalUpdateTime(gameTime));
-                
+
                 base.Update(gameTime);
                 oldTotalUpdateTime = gameTime.TotalGameTime.TotalSeconds;
                 u = 0;
@@ -295,7 +298,8 @@ namespace ProjectRevolution
                     if (!body.IsStar)   //If the body is a star then it skips the drawing of tail since it is supposed to be stationary
                     {
                         Planet planet = body as Planet;
-                        spriteCache[planet].Add(planet.Position);
+                        //spriteCache[planet].Add(planet.Position);
+                        spriteCache[planet].Add(new Vector2(Convert.ToSingle(planet.Position.X + body.radius - 2), Convert.ToSingle(planet.Position.Y + body.radius - 2)));
                         if (spriteCache[planet].Count >= spriteCacheSize)
                         {
                             spriteCache[planet].RemoveAt(0);
@@ -306,13 +310,13 @@ namespace ProjectRevolution
                         }
                     }
 
-                    //Draws thebody itself
+                    //Draws the body itself
                     spriteBatch.Draw(body.Texture, body.Position);  
 
                     //Followed by the marker ontop of the body's sprite id it has been selected
                     if (body == selectedBody)
                     {
-                        spriteBatch.Draw(markerSprite, new Vector2(body.Position.X - 3, body.Position.Y - 3));
+                        spriteBatch.Draw(markerSprite, new Vector2(Convert.ToSingle(body.Position.X + body.radius - 11), Convert.ToSingle(body.Position.Y + body.radius - 11)));
                     }
                 }
 
