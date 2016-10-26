@@ -19,6 +19,7 @@ namespace ProjectRevolution
         // Om null försvinner dem aldrig
         int? fadeDegree;
         Vector2 screenCenter;
+        double lastAngleDifference;
         
 
         public Texture2D Texture { get { return tailSprite; } }
@@ -45,7 +46,7 @@ namespace ProjectRevolution
             {
                 for (int i = tailPositions.Count - 1; i >= 0; i--)
                 {
-                    if (isPositionOutOfBounds(tailPositions[i]))
+                    if (isPositionOutOfBounds(tailPositions[i], i))
                     {
                         tailPositions.RemoveAt(0);
                     }
@@ -60,7 +61,7 @@ namespace ProjectRevolution
         }
 
         // Kollar om en Vector2-position är inom det specifierade gradintervallet.
-        private bool isPositionOutOfBounds(Vector2 position)
+        private bool isPositionOutOfBounds(Vector2 position, int iteration)
         {
             if (fadeDegree == null)
             {
@@ -75,6 +76,14 @@ namespace ProjectRevolution
             float comparisonAngle = Planet.VectorToAngle(comparisonMiddlePosition);
 
             double angleDifference = Math.Ceiling(180 - Math.Abs(Math.Abs(comparisonAngle - planetAngle) - 180));
+            if (iteration == tailPositions.Count - 1)
+            {
+                lastAngleDifference = angleDifference;
+            }
+            if (lastAngleDifference > angleDifference)
+            {
+                return true;
+            }
 
             if (angleDifference < fadeDegree)
             {

@@ -119,6 +119,7 @@ namespace ProjectRevolution
         {
             double degrees = Math.Atan2(-vector.Y, vector.X);
             //double degrees = MathHelper.ToDegrees(Convert.ToSingle(radians));
+            // don't ask
             degrees = (degrees > 0 ? degrees : (2 * Math.PI + degrees)) * 360 / (2 * Math.PI);
             return Convert.ToSingle(degrees);
         }
