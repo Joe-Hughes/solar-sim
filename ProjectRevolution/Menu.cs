@@ -71,10 +71,10 @@ namespace ProjectRevolution
                 Planet planet = body as Planet;
 
                 txtBoxName.Text = planet.Name;
-                txtBoxDis.Text = (planet.DetermineDistance(sun) * planet.ScaleMultiplier).ToString();
-                txtBoxVel.Text = planet.Speed.ToString();
-                txtBoxAcc.Text = planet.Acceleration.ToString();
-                txtBoxForce.Text = planet.Force.ToString();
+                txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier)).ToString();
+                txtBoxVel.Text = Math.Round(planet.Speed).ToString();
+                txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString();
+                txtBoxForce.Text = Math.Round(planet.Force).ToString();
             }
             else
             {

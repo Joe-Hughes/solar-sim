@@ -63,8 +63,8 @@ namespace ProjectRevolution
             IsFixedTimeStep = false;    // unlocks framerate
             graphics.SynchronizeWithVerticalRetrace = false;    // disables Vsync
             graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window
-            graphics.PreferredBackBufferHeight = 768;   // set this value to the desired height of your window
-            graphics.IsFullScreen = true;
+            graphics.PreferredBackBufferHeight = 668;   // set this value to the desired height of your window
+            graphics.IsFullScreen = false;
             graphics.ApplyChanges();
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
             pauseBtn = new Rectangle(graphics.PreferredBackBufferWidth - 324, graphics.PreferredBackBufferHeight - 50, 100, 50);
@@ -122,14 +122,14 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
 
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, mercurySprite, sun, graphics);
-            bodies.Add(mercury);
+            //Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, mercurySprite, sun, graphics);
+            //bodies.Add(mercury);
 
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, earthSprite, sun, graphics);
-            bodies.Add(earth);
+            //Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, earthSprite, sun, graphics);
+            //bodies.Add(earth);
 
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, marsSprite, sun, graphics);
-            bodies.Add(mars);
+            //Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, marsSprite, sun, graphics);
+            //bodies.Add(mars);
 
             Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, jupiterSprite, sun, graphics);
             bodies.Add(jupiter);
@@ -167,9 +167,9 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
-            if (IrlTotalUpdateTime(gameTime) >= 0.01)
+            if (IrlTotalUpdateTime(gameTime) > 0.01)
             { 
-                if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+               if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
 
                 KeyboardState keyboard = Keyboard.GetState();
@@ -182,10 +182,16 @@ namespace ProjectRevolution
                 { 
                     if(mouseHold == false)
                     {
-                        if (IsMouseInArea(mouse, pauseBtn.Location, pauseBtn.Height, pauseBtn.Width))
+                        //(mouse.Position.X - pauseBtn.Location.X < pauseBtn.Height && mouse.Position.X - pauseBtn.Location.X > 0)
+                            //&& (mouse.Position.Y - pauseBtn.Location.Y < pauseBtn.Width && mouse.Position.Y - pauseBtn.Location.Y > 0)
+                        if ((mouse.Position.X > pauseBtn.Location.X && mouse.Position.X < pauseBtn.Location.X + pauseBtn.Width)
+                            && (mouse.Position.Y > pauseBtn.Location.Y && mouse.Position.Y < pauseBtn.Location.Y + pauseBtn.Height))
                         {
                             pause = !pause;
-                            menu.UpdateValues();
+                            if (isSelectedBody)
+                            {
+                                menu.UpdateValues();
+                            }
                             takeKeyboardInput = false;
                         }
 
@@ -204,63 +210,74 @@ namespace ProjectRevolution
                         }
                     }
 
-                    if (keyboard.IsKeyDown(Keys.LeftShift))
+                    //if (keyboard.IsKeyDown(Keys.LeftShift))
+                    //{
+                    //    if (!pause)
+                    //    {
+                    //        if (shiftMouseHold)
+                    //        {
+                    //            dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
+                    //                initialPos.Y - mouse.Position.ToVector2().Y);
+                    //        }
+                    //        else
+                    //        {
+                    //            // Ser till att musen inte befinner sig utanför rutan när man droppar in planeter
+                    //            if (IsMouseInArea(mouse, new Point(0, 0), graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth - menuBackground.Width))
+                    //            {
+                    //                initialPos = mouse.Position.ToVector2();
+                    //                mouseHold = true;
+                    //                Console.WriteLine("Mouse: " + initialPos);
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
+                    //else
+                    //{
+                    //    foreach (Body body in bodies)
+                    //    {
+                    //        if ((mouse.Position.X - body.Position.X < body.radius * 2 && mouse.Position.X - body.Position.X > 0)
+                    //            && (mouse.Position.Y - body.Position.Y < body.radius * 2 && mouse.Position.Y - body.Position.Y > 0))
+                    //        {
+                    //            selectedBody = body;
+                    //            isSelectedBody = true;
+                    //            menu.Body = body;
+                    //        }
+                    //    }
+                    //}
+
+                    foreach (Body body in bodies)
                     {
-                        if (!pause)
+                        if ((mouse.Position.X - body.Position.X < body.radius * 2 && mouse.Position.X - body.Position.X > 0)
+                            && (mouse.Position.Y - body.Position.Y < body.radius * 2 && mouse.Position.Y - body.Position.Y > 0))
                         {
-                            if (shiftMouseHold)
-                            {
-                                dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
-                                    initialPos.Y - mouse.Position.ToVector2().Y);
-                            }
-                            else
-                            {
-                                // Ser till att musen inte befinner sig utanför rutan när man droppar in planeter
-                                if (IsMouseInArea(mouse, new Point(0, 0), graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth - menuBackground.Width))
-                                {
-                                    initialPos = mouse.Position.ToVector2();
-                                    mouseHold = true;
-                                    Console.WriteLine("Mouse: " + initialPos);
-                                }
-                            }
+                            selectedBody = body;
+                            isSelectedBody = true;
+                            menu.Body = body;
                         }
                     }
-
-                    else
-                    {
-                        foreach (Body body in bodies)
-                        {
-                            if ((mouse.Position.X - body.Position.X < body.radius * 2 && mouse.Position.X - body.Position.X > 0)
-                                && (mouse.Position.Y - body.Position.Y < body.radius * 2 && mouse.Position.Y - body.Position.Y > 0))
-                            {
-                                selectedBody = body;
-                                isSelectedBody = true;
-                                menu.Body = body;
-                            }
-                        }
-                    }  
                     mouseHold = true;
                 }
 
                 else if (mouse.LeftButton == ButtonState.Released)
                 {
-                    if (shiftMouseHold == true)
-                    {
-                        shiftMouseHold = false;
-                        Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
+                //    if (shiftMouseHold == true)
+                //    {
+                //        shiftMouseHold = false;
+                //        Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
 
-                        initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
-                        initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
+                //        initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
+                //        initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
 
-                        double mass = bodies[1].Mass; // Jordens massa
-                        string name = "Planet" + bodies.Count.ToString();
+                //        double mass = bodies[1].Mass; // Jordens massa
+                //        string name = "Planet" + bodies.Count.ToString();
 
-                        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics);
-                        Console.WriteLine("Planet added at: " + spwnObject.Position);
-                        bodies.Add(spwnObject);
-                        planets.Add(spwnObject);
-                        spriteCache.Add(spwnObject, new List<Vector2>());
-                    }
+                //        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics);
+                //        Console.WriteLine("Planet added at: " + spwnObject.Position);
+                //        bodies.Add(spwnObject);
+                //        planets.Add(spwnObject);
+                //        spriteCache.Add(spwnObject, new List<Vector2>());
+                //    }
                     mouseHold = false;
                 }
 
@@ -272,13 +289,9 @@ namespace ProjectRevolution
                     }
                 }
 
-                //Console.WriteLine("Update: " + gameTime.ElapsedGameTime.TotalSeconds.ToString() + "   :   " + IrlTotalUpdateTime(gameTime));
-
                 base.Update(gameTime);
                 oldTotalUpdateTime = gameTime.TotalGameTime.TotalSeconds;
-                u = 0;
             }
-            u += gameTime.ElapsedGameTime.TotalSeconds;
         }
 
 
@@ -286,9 +299,10 @@ namespace ProjectRevolution
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        int i = 0;
         protected override void Draw(GameTime gameTime)
         {
-            if (IrlTotalDrawTime(gameTime) >= 0.0167)
+            if (IrlTotalDrawTime(gameTime) > 0.0167)
             {
                 //MakeDaPictures
                 graphics.GraphicsDevice.Clear(Color.Black);
@@ -332,17 +346,12 @@ namespace ProjectRevolution
                 {
                     spriteBatch.Draw(pauseBtnSprite, null, pauseBtn);
                 }
-                
+
 
                 //Draws the debug counter in the top left corner
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
-                if(1/ IrlTotalDrawTime(gameTime) > 100)
-                {
-                    Console.WriteLine(IrlTotalDrawTime(gameTime));
-                }
-                double updateTime = IrlTotalUpdateTime(gameTime);
-                if (updateTime != 0)    //Temporary
-                    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / updateTime), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
+                //if (IrlTotalUpdateTime(gameTime) != 0)    //Temporary
+                //    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / IrlTotalUpdateTime(gameTime)), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
                 
                 //If it's selected the planets info gets drawn ontop of the menu's background sprite
                 if (isSelectedBody)
@@ -354,12 +363,9 @@ namespace ProjectRevolution
                     menu.DrawStrings(spriteBatch);
                 }
                 spriteBatch.End();
-                base.Draw(gameTime);
-
                 oldTotalDrawTime = gameTime.TotalGameTime.TotalSeconds;
-                d = 0;
+                base.Draw(gameTime);
             }
-            d += gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         public double IrlTotalUpdateTime(GameTime gametime)
