@@ -31,9 +31,9 @@ namespace ProjectRevolution
         List<Planet> planets = new List<Planet>();
 
         bool mouseHold = false;
-        bool shiftMouseHold = false;
-        Vector2 initialPos;
-        Vector2 dragVector;
+        //bool shiftMouseHold = false;
+        //Vector2 initialPos;
+        //Vector2 dragVector;
 
         bool takeKeyboardInput = false;
         Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
@@ -43,15 +43,12 @@ namespace ProjectRevolution
         SpriteFont arial;
         Rectangle menuBackground;
         Menu menu;
-        TextBox selectedTxtBox;
+        //TextBox selectedTxtBox;
 
         Body selectedBody;
         bool isSelectedBody = false;
 
         KbHandler kbHandler = new KbHandler();
-
-        double d = 0.02;
-        double u = 0.01;
 
         double oldTotalUpdateTime = 0;
         double oldTotalDrawTime = 0;
@@ -62,8 +59,8 @@ namespace ProjectRevolution
             Content.RootDirectory = "Content";
             IsFixedTimeStep = false;    // unlocks framerate
             graphics.SynchronizeWithVerticalRetrace = false;    // disables Vsync
-            graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window
-            graphics.PreferredBackBufferHeight = 668;   // set this value to the desired height of your window
+            graphics.PreferredBackBufferWidth = 1366;  // set this value to the desired width of your window. Standard: 1366
+            graphics.PreferredBackBufferHeight = 768;   // set this value to the desired height of your window. Standard: 768
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
@@ -182,8 +179,6 @@ namespace ProjectRevolution
                 { 
                     if(mouseHold == false)
                     {
-                        //(mouse.Position.X - pauseBtn.Location.X < pauseBtn.Height && mouse.Position.X - pauseBtn.Location.X > 0)
-                            //&& (mouse.Position.Y - pauseBtn.Location.Y < pauseBtn.Width && mouse.Position.Y - pauseBtn.Location.Y > 0)
                         if ((mouse.Position.X > pauseBtn.Location.X && mouse.Position.X < pauseBtn.Location.X + pauseBtn.Width)
                             && (mouse.Position.Y > pauseBtn.Location.Y && mouse.Position.Y < pauseBtn.Location.Y + pauseBtn.Height))
                         {
@@ -294,12 +289,10 @@ namespace ProjectRevolution
             }
         }
 
-
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        int i = 0;
         protected override void Draw(GameTime gameTime)
         {
             if (IrlTotalDrawTime(gameTime) > 0.0167)

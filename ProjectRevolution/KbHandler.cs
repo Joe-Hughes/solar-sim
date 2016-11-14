@@ -55,6 +55,18 @@ namespace ProjectRevolution
             {
                 menu.PushChanges();
             }
+            else if (key == Keys.E)
+            {
+                menu.Selected.Text += "E";
+            }
+            else if (key == Keys.OemPlus)
+            {
+                menu.Selected.Text += "+";
+            }
+            else if (key == Keys.OemMinus)
+            {
+                menu.Selected.Text += "-";
+            }
             else
             {
                 string rxPattern = @"D\d";

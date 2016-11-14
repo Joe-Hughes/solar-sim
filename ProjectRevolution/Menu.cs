@@ -84,12 +84,36 @@ namespace ProjectRevolution
 
         public void PushChanges()
         {
-            if(!this.body.IsStar)
+            if (!this.body.IsStar)
             {
                 Planet planet = body as Planet;
 
-                planet.Name = txtBoxName.Text;
+                foreach (TextBox txtBox in txtBoxes)
+                {
+                    ConvertDisplayToDouble(txtBox);
+                }
             }
+        }
+
+        private double ConvertDisplayToDouble (TextBox txtBox)
+        {
+            string txt = txtBox.Text;
+
+            double displayValue = 0;
+
+            if (txt.Contains("E"))
+            {
+                String[] strValues = txt.Split('E');
+                double[] numbValues = new double[2];
+                if (double.TryParse(strValues[0], out numbValues[0]) && double.TryParse(strValues[1], out numbValues[1]))
+                {
+                    displayValue = numbValues[0] * Math.Pow(10, numbValues[1]);
+                }
+            }
+            else
+                double.TryParse(txt, out displayValue);
+
+            return displayValue;
         }
     }
 }
