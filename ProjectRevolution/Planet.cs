@@ -16,6 +16,7 @@ namespace ProjectRevolution
         private double force; // Enhet: newton
         private double speed; // Hastighet i SI-enheter alltså meter/sekund
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
+        private Tail tail;
 
         public Vector2 Velocity { get { return velocity; } set { } }
         public double Acceleration { get { return acceleration; } }
@@ -35,11 +36,13 @@ namespace ProjectRevolution
             }
         }
 
+        public Tail Tail { get { return tail; } }
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
-            double initialVelocity, Texture2D texture, Body star, GraphicsDeviceManager graphics)
-            : base(mass, name, texture, graphics)
+            double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDeviceManager graphicsDevice)
+            : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
+            tail = new Tail(this.name, texture.Width/2, tailTexture, 160, graphicsDevice); // Tar bort tails efter 340 grader
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
@@ -50,8 +53,8 @@ namespace ProjectRevolution
 
             this.radius = texture.Width / 2;
 
-            double posX = Game1.GetCenter(graphics).X - star.radius + angleVector.X;
-            double posY = Game1.GetCenter(graphics).Y - star.radius + angleVector.Y;
+            double posX = Game1.GetCenter(graphicsDevice).X - star.radius + angleVector.X;
+            double posY = Game1.GetCenter(graphicsDevice).Y - star.radius + angleVector.Y;
 
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
@@ -128,15 +131,18 @@ namespace ProjectRevolution
         // Konverterar en vinkel angiven i grader och returnerar en vektor motsvarande den platsen i enhetscirkeln.
         public static Vector2 AngleToVector(double angle)
         {
-            double radians = angle * (Math.PI / 180);
+            double radians = MathHelper.ToRadians(Convert.ToSingle(angle));
             return new Vector2((float)Math.Cos(radians), -(float)Math.Sin(radians));
         }
 
         // Konverterar en position i enhetscirkeln till motsvarande vinkel i grader.
         public static float VectorToAngle(Vector2 vector)
         {
-            double radians = Math.Atan2(vector.X, -vector.Y);
-            return (float)(radians * (Math.PI / 180));
+            double degrees = Math.Atan2(-vector.Y, vector.X);
+            //double degrees = MathHelper.ToDegrees(Convert.ToSingle(radians));
+            // don't ask
+            degrees = (degrees > 0 ? degrees : (2 * Math.PI + degrees)) * 360 / (2 * Math.PI);
+            return Convert.ToSingle(degrees);
         }
 
         public void ChangeSpeed(double V)

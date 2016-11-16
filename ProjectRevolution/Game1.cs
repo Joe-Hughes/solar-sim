@@ -31,7 +31,6 @@ namespace ProjectRevolution
 
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
-        Dictionary<Planet, List<Vector2>> spriteCache = new Dictionary<Planet, List<Vector2>>();
 
         public static double referenceDistanceInUnits;
         public static double referenceDistanceInMeters;
@@ -57,7 +56,6 @@ namespace ProjectRevolution
         double oldTotalDrawTime = 0;
 
         // Programvariabler
-        int spriteCacheSize = 3000;
         double preferedFPS = 60;
         double preferedUPS = 2 * 60;
         int wait = 0;
@@ -86,16 +84,8 @@ namespace ProjectRevolution
             graphics.SynchronizeWithVerticalRetrace = false;    // Stänger av Vsync
             graphics.PreferredBackBufferWidth = windowWidth;   // Spelrutans bredd i pixlar
             graphics.PreferredBackBufferHeight = windowHeight;   // Spelrutans höjd i pixlar
-
-            // Om skärmen är 1366x768, spela i fullskärm, annars, centralisera rutan på skärmen
-            if (false)
-            {
-                graphics.IsFullScreen = true;
-            }
-            else
-            {
-                this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
-            }
+            graphics.IsFullScreen = false;
+            this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
 
             graphics.PreferMultiSampling = true;    // Förminskar pixelering på icke-raka linjer
             graphics.ApplyChanges();
@@ -105,7 +95,7 @@ namespace ProjectRevolution
             // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
             // Planet: Nepunus
             referenceDistanceInUnits = (graphics.PreferredBackBufferHeight / 2) - 10;
-            referenceDistanceInMeters = 4495.1 * Math.Pow(10, 9);
+            referenceDistanceInMeters = 1433.5 * Math.Pow(10, 9);
 
             drawFrequency = 1 / preferedFPS; // brukade vara 0.02
             updateFrequency = 1 / preferedUPS; // brukade vara 0.01
@@ -151,25 +141,25 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
 
-            //Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, mercurySprite, sun, graphics);
-            //bodies.Add(mercury);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, mercurySprite, tailSprite, sun, graphics);
+            bodies.Add(mercury);
 
-            //Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, earthSprite, sun, graphics);
-            //bodies.Add(earth);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, earthSprite, tailSprite, sun, graphics);
+            bodies.Add(earth);
 
-            //Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, marsSprite, sun, graphics);
-            //bodies.Add(mars);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, marsSprite, tailSprite, sun, graphics);
+            bodies.Add(mars);
 
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, jupiterSprite, sun, graphics);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, jupiterSprite, tailSprite, sun, graphics);
             bodies.Add(jupiter);
 
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, saturnusSprite, sun, graphics);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, saturnusSprite, tailSprite, sun, graphics);
             bodies.Add(saturn);
 
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, uranusSprite, sun, graphics);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, uranusSprite, tailSprite, sun, graphics);
             bodies.Add(uranus);
 
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, neptunusSprite, sun, graphics);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, neptunusSprite, tailSprite, sun, graphics);
             bodies.Add(neptune);
 
             menu = new Menu(sun, graphics, arial);
@@ -180,7 +170,6 @@ namespace ProjectRevolution
                 {
                     Planet planet = body as Planet;
                     planets.Add(planet);
-                    spriteCache.Add(planet, new List<Vector2>());
                 }
             }
         }
@@ -255,6 +244,7 @@ namespace ProjectRevolution
                     foreach (Planet planet in planets)
                     {
                         planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                        planet.Tail.AddTailPosition(planet);
                     }
                 }
 
@@ -276,48 +266,40 @@ namespace ProjectRevolution
                 spriteBatch.Begin();
                 foreach (Body body in bodies)
                 {
-                    if (!body.IsStar)   //If the body is a star then it skips the drawing of tail since it is supposed to be stationary
+                    // Ritar ut tails för alla planeter
+                    if (!body.IsStar)
                     {
                         Planet planet = body as Planet;
-
-                        spriteCache[planet].Add(new Vector2(Convert.ToSingle(planet.Position.X + planet.radius), Convert.ToSingle(planet.Position.Y + planet.radius)));
-                        // DEBUG
-                        //if (planet.Name == "Neptune")
-                        //{
-                        //    Vector2 center = Game1.GetCenter(graphics.GraphicsDevice);
-                        //    Console.WriteLine(planet.Name + " X: " + (planet.Position.X - center.X + planet.radius) + " Y: " + (planet.Position.Y - center.Y + planet.radius));
-                        //}
-                        if (spriteCache[planet].Count >= spriteCacheSize)
+                        Tail tail = planet.Tail;
+                        foreach (Vector2 position in tail.GetTailPositions())
                         {
-                            spriteCache[planet].RemoveAt(0);
-                        }
-                        foreach (Vector2 position in spriteCache[planet])
-                        {
-                            spriteBatch.Draw(tailSprite, position);
+                            spriteBatch.Draw(tail.Texture, Vector2.Add(position, new Vector2(Convert.ToSingle(planet.radius))));
                         }
                     }
 
-                    //Draws the body itself
-
+                    // Ritar själva kroppen
                     spriteBatch.Draw(body.Texture, body.Position);
 
-                    //Followed by the marker ontop of the body's sprite id it has been selected
+                    // Ritar markören om kroppe är markerad
                     if (body == selectedBody)
 
+                    // Ritar själva kroppen
+                    spriteBatch.Draw(body.Texture, body.Position);  
+
+                    // Ritar markören om kroppe är markerad
+                    if (body == selectedBody)
                     {
                         spriteBatch.Draw(markerSprite, new Vector2(Convert.ToSingle(body.Position.X + body.radius - 11), Convert.ToSingle(body.Position.Y + body.radius - 11)));
                     }
                 }
 
-                //Draws the menu's background color
+                // Ritar menyns bakgrundsfärg
                 spriteBatch.Draw(menuSprite, null, menuBackground);
-                Console.WriteLine("Menu: " + menuBackground.Location);
-                Console.WriteLine("Button: " + pauseButton.ButtonArea.Location.ToVector2());
 
-                //Draw pause button
+                // Ritar pausknappen
                 spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
 
-                //Draws the debug counter in the top left corner
+                // Ritar debugmätarna för FPS och UPS
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
                 //if (IrlTotalUpdateTime(gameTime) != 0)    //Temporary
                 //    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / IrlTotalUpdateTime(gameTime)), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
@@ -347,9 +329,8 @@ namespace ProjectRevolution
 
         public static Vector2 GetCenter(GraphicsDeviceManager graphicsDevice)
         {
-
             Point window = graphicsDevice.GraphicsDevice.PresentationParameters.Bounds.Center;
-            window.X -= 162;
+            window.X -= 324 / 2;
             Vector2 center = window.ToVector2();
 
             return center;
@@ -405,7 +386,16 @@ namespace ProjectRevolution
 
 
 
-
+// Om skärmen är 1366x768, spela i fullskärm, annars, centralisera rutan på skärmen
+//if (false)
+//{
+//    graphics.IsFullScreen = false;
+//    this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
+//}
+//else
+//{
+//    this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
+//}
 
 //if (keyboard.IsKeyDown(Keys.LeftShift))
 //{
