@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace ProjectRevolution
 {
+    // TODO dra linjer mellan punkterna för en jämnare svans
     class Tail
     {
         string planetName;
@@ -33,6 +34,7 @@ namespace ProjectRevolution
             this.screenCenter = Game1.GetCenter(gd);
         }
 
+        // Lägger till en planetens position i svansens historik
         public void AddTailPosition(Planet planet)
         {
             tailPositions.Add(planet.Position);
@@ -61,25 +63,36 @@ namespace ProjectRevolution
         }
 
         // Kollar om en Vector2-position är inom det specifierade gradintervallet.
+        // OBS: fungerar endast upp till 179 grader!!!! TODO: fixa det
         private bool isPositionOutOfBounds(Vector2 position, int iteration)
         {
+            // Om ingen fadeDegree angetts tas svansen aldrig bort.
+            // Hade varit bättre att ta bort efter 360 grader men funktionen är för nuvarande begränsad till 179.
             if (fadeDegree == null)
             {
                 return false;
             }
+
             Vector2 radiusLength = new Vector2(planetRadius);
+            // Planetens position i relation till skärmens mitt.
             Vector2 planetMiddlePosition = Vector2.Add(position, radiusLength) - screenCenter;
+            // Positionen av den tidigast sparade svanspositionen i relation till skärmens mitt
             Vector2 comparisonMiddlePosition = Vector2.Add(tailPositions[0], radiusLength) - screenCenter;
-            //double planetAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(planetMiddlePosition)));
-            //double comparisonAngle = Math.Abs(Math.Round((double)Planet.VectorToAngle(comparisonMiddlePosition)));
+
+            // Båda graderna beräknas trigonometriskt utifrån deras position runt stjärnan.
             float planetAngle = Planet.VectorToAngle(planetMiddlePosition);
             float comparisonAngle = Planet.VectorToAngle(comparisonMiddlePosition);
 
+            // Beräknar den absoluta skillnaden mellan de två graderna.
+            // Källa: http://gamedev.stackexchange.com/a/4472
             double angleDifference = Math.Ceiling(180 - Math.Abs(Math.Abs(comparisonAngle - planetAngle) - 180));
+
+            // Om det är första gången funktionen körs likställs graderna då de beskriver samma plats.
             if (iteration == tailPositions.Count - 1)
             {
                 lastAngleDifference = angleDifference;
             }
+
             if (lastAngleDifference > angleDifference)
             {
                 return true;

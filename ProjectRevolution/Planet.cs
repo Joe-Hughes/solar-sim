@@ -29,7 +29,7 @@ namespace ProjectRevolution
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
-            tail = new Tail(this.name, texture.Width/2, tailTexture, 190, graphicsDevice); // Tar bort tails efter 340 grader
+            tail = new Tail(this.name, texture.Width/2, tailTexture, 175, graphicsDevice); // Tar bort tails efter 340 grader
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
