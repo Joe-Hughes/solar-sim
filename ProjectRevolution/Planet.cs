@@ -17,14 +17,27 @@ namespace ProjectRevolution
         private double speed; // Hastighet i SI-enheter alltså meter/sekund
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
 
-        public Vector2 Velocity { get { return velocity; } }
+        public Vector2 Velocity { get { return velocity; } set { } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
-        public double Speed { get { return speed; } }
+        public double Speed
+        {
+            get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); }
+            set
+            {
+                double V = value / scaleMultiplier;
+                Vector2 normVelocity = this.velocity;
+                normVelocity.Normalize();
+                this.velocity.X = Convert.ToSingle(V) * normVelocity.X;
+                this.velocity.Y = Convert.ToSingle(V) * normVelocity.Y;
+
+                Console.WriteLine(velocity.ToString());
+            }
+        }
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
-            double initialVelocity, Texture2D texture, Body star, GraphicsDevice graphicsDevice)
-            : base(mass, name, texture, graphicsDevice)
+            double initialVelocity, Texture2D texture, Body star, GraphicsDeviceManager graphics)
+            : base(mass, name, texture, graphics)
         {
             this.isStar = false;
 
@@ -35,27 +48,35 @@ namespace ProjectRevolution
             angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
             Console.WriteLine("Multiplied: " + angleVector);
 
-            double posX = Game1.GetCenter(graphicsDevice).X - radius + angleVector.X;
-            double posY = Game1.GetCenter(graphicsDevice).Y - radius + angleVector.Y;
+            this.radius = texture.Width / 2;
+
+            double posX = Game1.GetCenter(graphics).X - star.radius + angleVector.X;
+            double posY = Game1.GetCenter(graphics).Y - star.radius + angleVector.Y;
+
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
 
             // Skapar en vektor som har en riktning enligt velocityAngle och längd enligt initialVelocity
             Vector2 velocityVector = AngleToVector(velocityAngle);
             this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
+
+            // Skapar all text som komer visas i menyn när denna planet är vald
         }
 
         //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
         public Planet(double mass, string name, Vector2 position, Vector2 velocity,
-            Texture2D texture, Body star, GraphicsDevice graphicsDevice)
-            : base(mass, name, texture, graphicsDevice)
+            Texture2D texture, Body star, GraphicsDeviceManager graphics)
+            : base(mass, name, texture, graphics)
         {
             this.isStar = false;
 
             this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
 
-            double posX = Game1.GetCenter(graphicsDevice).X - radius + position.X;
-            double posY = Game1.GetCenter(graphicsDevice).Y - radius + position.Y;
+            this.radius = texture.Width / 2;
+
+            double posX = Game1.GetCenter(graphics).X - star.radius + position.X;
+            double posY = Game1.GetCenter(graphics).Y - star.radius + position.Y;
+
             this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
         }
 
@@ -70,8 +91,8 @@ namespace ProjectRevolution
                 {
 
                     // radien behöver adderas på båda distanserna då positionen tas från det över vänstra hörnet av kroppen.
-                    double xDistance = (otherBody.Position.X + otherBody.radius) - (this.position.X + otherBody.radius);
-                    double yDistance = (otherBody.Position.Y + otherBody.radius) - (this.position.Y + otherBody.radius);
+                    double xDistance = (otherBody.Position.X + otherBody.radius) - (this.position.X + this.radius);
+                    double yDistance = (otherBody.Position.Y + otherBody.radius) - (this.position.Y + this.radius);
 
                     Vector2 direction = new Vector2(Convert.ToSingle(xDistance), Convert.ToSingle(yDistance));
                     direction.Normalize();
@@ -96,8 +117,8 @@ namespace ProjectRevolution
             // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen och beräknas utifrån den
             this.velocity += velocityVector;
 
-            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
-            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
+            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
 
             speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
             acceleration = (speed - oldSpeed) / totalSecondsSinceUpdate;
@@ -116,6 +137,11 @@ namespace ProjectRevolution
         {
             double radians = Math.Atan2(vector.X, -vector.Y);
             return (float)(radians * (Math.PI / 180));
+        }
+
+        public void ChangeSpeed(double V)
+        {
+            
         }
     }
 }

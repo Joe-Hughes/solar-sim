@@ -20,6 +20,7 @@ namespace ProjectRevolution
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
         protected bool isStar = true;
+        
 
         // Använd en planet som referenspunkt för att få fram meter per positionsenhet.
         // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
@@ -35,12 +36,14 @@ namespace ProjectRevolution
         public Vector2 Position { get { return position; } }
         public double Mass { get { return mass; } }
         public Texture2D Texture { get { return texture; } }
-        public string Name { get { return name; } }
+        public string Name { get { return name; } set { this.name = value; } }
         public double Radius { get { return radius; } }
         public bool IsStar { get { return isStar; } }
+        public double ScaleMultiplier { get { return scaleMultiplier; } }
+        
 
         // Denna konstruktor används för stjärnor
-        public Body(double mass, string name, Texture2D texture, GraphicsDevice graphicsDevice)
+        public Body(double mass, string name, Texture2D texture, GraphicsDeviceManager graphics)
         {
             this.mass = mass;
             this.radius = texture.Width / 2;
@@ -48,8 +51,8 @@ namespace ProjectRevolution
             this.texture = texture;
 
             // Sätter stjärnan i mitten av skärmen genom att ta skärmstorleken och dela på två
-            this.position.X = Convert.ToSingle(Game1.GetCenter(graphicsDevice).X - radius);
-            this.position.Y = Convert.ToSingle(Game1.GetCenter(graphicsDevice).Y - radius);
+            this.position.X = Convert.ToSingle(Game1.GetCenter(graphics).X - radius);
+            this.position.Y = Convert.ToSingle(Game1.GetCenter(graphics).Y - radius);
         }
 
         // returnerar distansen mellan denna och en annan kropp genom Pytagoras sats
