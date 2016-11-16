@@ -11,6 +11,7 @@ namespace ProjectRevolution
 {
     public class TextBox
     {
+        //alla egenskaper av en textBox
         protected bool selected;
         protected string text;
         protected SpriteFont font;

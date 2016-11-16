@@ -57,15 +57,24 @@ namespace ProjectRevolution
             }
             else if (key == Keys.E)
             {
-                menu.Selected.Text += "E";
+                if(!menu.Selected.Text.Contains("E"))
+                {
+                    menu.Selected.Text += "E";
+                }
             }
             else if (key == Keys.OemPlus)
             {
-                menu.Selected.Text += "+";
+                if (!menu.Selected.Text.Contains("+"))
+                {
+                    menu.Selected.Text += "+";
+                }
             }
             else if (key == Keys.OemMinus)
             {
-                menu.Selected.Text += "-";
+                if (!menu.Selected.Text.Contains("-"))
+                {
+                    menu.Selected.Text += "-";
+                }
             }
             else
             {

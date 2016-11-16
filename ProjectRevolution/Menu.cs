@@ -74,7 +74,7 @@ namespace ProjectRevolution
                 txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier)).ToString();
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString();
                 txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString();
-                txtBoxForce.Text = Math.Round(planet.Force).ToString();
+                txtBoxForce.Text = Math.Round(planet.Force, 2).ToString();
             }
             else
             {
@@ -88,13 +88,11 @@ namespace ProjectRevolution
             {
                 Planet planet = body as Planet;
 
-                foreach (TextBox txtBox in txtBoxes)
-                {
-                    ConvertDisplayToDouble(txtBox);
-                }
+                planet.Speed = ConvertDisplayToDouble(txtBoxVel);
             }
         }
 
+        //Konverterar från textrepresentationen av ett nummer (t.ex. 2,23E+4) till en double
         private double ConvertDisplayToDouble (TextBox txtBox)
         {
             string txt = txtBox.Text;
@@ -111,8 +109,9 @@ namespace ProjectRevolution
                 }
             }
             else
+            {
                 double.TryParse(txt, out displayValue);
-
+            }
             return displayValue;
         }
     }

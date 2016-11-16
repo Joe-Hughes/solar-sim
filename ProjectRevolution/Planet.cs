@@ -20,7 +20,20 @@ namespace ProjectRevolution
         public Vector2 Velocity { get { return velocity; } set { } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
-        public double Speed { get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); } }
+        public double Speed
+        {
+            get { return Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2)); }
+            set
+            {
+                double V = value / scaleMultiplier;
+                Vector2 normVelocity = this.velocity;
+                normVelocity.Normalize();
+                this.velocity.X = Convert.ToSingle(V) * normVelocity.X;
+                this.velocity.Y = Convert.ToSingle(V) * normVelocity.Y;
+
+                Console.WriteLine(velocity.ToString());
+            }
+        }
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
             double initialVelocity, Texture2D texture, Body star, GraphicsDeviceManager graphics)
@@ -126,6 +139,11 @@ namespace ProjectRevolution
         {
             double radians = Math.Atan2(vector.X, -vector.Y);
             return (float)(radians * (Math.PI / 180));
+        }
+
+        public void ChangeSpeed(double V)
+        {
+            
         }
     }
 }
