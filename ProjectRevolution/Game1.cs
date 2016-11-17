@@ -95,7 +95,7 @@ namespace ProjectRevolution
             // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
             // Planet: Nepunus
             referenceDistanceInUnits = (graphics.PreferredBackBufferHeight / 2) - 10;
-            referenceDistanceInMeters = 1433.5 * Math.Pow(10, 9);
+            referenceDistanceInMeters = 4433.5 * Math.Pow(10, 9);
 
             drawFrequency = 1 / preferedFPS; // brukade vara 0.02
             updateFrequency = 1 / preferedUPS; // brukade vara 0.01
@@ -136,30 +136,32 @@ namespace ProjectRevolution
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - menuWidth, 0, menuWidth, graphics.PreferredBackBufferHeight);
             pauseButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width,
                 graphics.PreferredBackBufferHeight - 50), 100, 50, Button.ButtonBehavior.Pause, pauseBtnSprite, playBtnSprite);
-
+            int[] randomDegrees = new int[2];
+            Random rng = new Random();
+            int rngNumb;
             // Skapar kroppar och lägger in dem i systemet
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
-
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, 90, 0, 47.4, mercurySprite, tailSprite, sun, graphics);
+            rngNumb = rng.Next(0, 360);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, rngNumb, rngNumb - 90, 47.4, mercurySprite, tailSprite, sun, graphics);
             bodies.Add(mercury);
-
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, 90, 0, 29.8, earthSprite, tailSprite, sun, graphics);
+            rngNumb = rng.Next(0, 360);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, sun, graphics);
             bodies.Add(earth);
-
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, 90, 0, 24.1, marsSprite, tailSprite, sun, graphics);
+            rngNumb = rng.Next(0, 360);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, rngNumb - 90, 24.1, marsSprite, tailSprite, sun, graphics);
             bodies.Add(mars);
-
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, 90, 0, 13.1, jupiterSprite, tailSprite, sun, graphics);
+            rngNumb = rng.Next(0, 360);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, rngNumb - 90, 13.1, jupiterSprite, tailSprite, sun, graphics);
             bodies.Add(jupiter);
-
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, 90, 0, 9.7, saturnusSprite, tailSprite, sun, graphics);
+            rngNumb = rng.Next(0, 360);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, rngNumb, rngNumb - 90, 9.7, saturnusSprite, tailSprite, sun, graphics);
             bodies.Add(saturn);
-
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, 90, 0, 6.8, uranusSprite, tailSprite, sun, graphics);
+            rngNumb = rng.Next(0, 360);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, rngNumb, rngNumb - 90, 6.8, uranusSprite, tailSprite, sun, graphics);
             bodies.Add(uranus);
-
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, 90, 0, 5.4, neptunusSprite, tailSprite, sun, graphics);
+            rngNumb = rng.Next(0, 360);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, rngNumb, rngNumb - 90, 5.4, neptunusSprite, tailSprite, sun, graphics);
             bodies.Add(neptune);
 
             menu = new Menu(sun, graphics, arial);
@@ -218,9 +220,6 @@ namespace ProjectRevolution
                             }
                         }
                     }
-
-
-
                     foreach (Body body in bodies)
                     {
                         if (IsMouseInArea(mouse, body.Position.ToPoint(), body.radius * 2, body.radius * 2))
@@ -355,6 +354,14 @@ namespace ProjectRevolution
         public Keys readKeyBoard()
         {
             return Keyboard.GetState().GetPressedKeys()[0];
+        }
+
+        public int[] GenerateRngStartingAngles ()
+        {
+            Random rng = new Random();
+            int degrees = rng.Next(0, 320);
+            int[] values = new int[2] { degrees, degrees - 90 };
+            return values;
         }
     }
 }
