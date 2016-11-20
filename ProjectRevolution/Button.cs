@@ -59,7 +59,7 @@ namespace ProjectRevolution
         }
 
         // click for Pause behavior
-        public bool CheckClick(MouseState mouse, bool mouseHold, bool pause)
+        public bool CheckClickPause(MouseState mouse, bool mouseHold, bool pause)
         {
             if (!mouseHold && Game1.IsMouseInArea(mouse, buttonArea.Location, buttonArea.Height, buttonArea.Width))
             {
@@ -67,6 +67,28 @@ namespace ProjectRevolution
                 ToggleTexture();
             }
             return pause;
+        }
+
+        public bool CheckClickZoom(MouseState mouse, bool mouseHold, bool isZoomedOut , double referenceDistanceInUnits)
+        {
+            if (!mouseHold && Game1.IsMouseInArea(mouse, buttonArea.Location, buttonArea.Height, buttonArea.Width))
+            {
+                double referenceDistanceInMeters;
+
+                if (isZoomedOut)
+                {
+                    referenceDistanceInMeters = 227.9 * Math.Pow(10, 9);
+                    Body.scaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
+                    isZoomedOut = false;
+                }
+                else
+                {
+                    referenceDistanceInMeters = 4433.5 * Math.Pow(10, 9);
+                    Body.scaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
+                    isZoomedOut = true;
+                }
+            }
+            return isZoomedOut;
         }
     }
 }

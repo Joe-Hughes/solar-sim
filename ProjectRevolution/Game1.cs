@@ -27,6 +27,7 @@ namespace ProjectRevolution
         Texture2D playBtnSprite;
 
         Button pauseButton;
+        Button zoomButton;
         SpriteFont arial;
 
         List<Body> bodies = new List<Body>();
@@ -41,6 +42,7 @@ namespace ProjectRevolution
         double updateFrequency;
 
         bool pause = false;
+        bool isZoomedOut = true;
 
         Rectangle menuBackground;
         Menu menu;
@@ -136,6 +138,7 @@ namespace ProjectRevolution
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - menuWidth, 0, menuWidth, graphics.PreferredBackBufferHeight);
             pauseButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width,
                 graphics.PreferredBackBufferHeight - 50), 100, 50, Button.ButtonBehavior.Pause, pauseBtnSprite, playBtnSprite);
+            zoomButton = new Button(Vector2.Add(GetCenter(graphics), new Vector2(-30, -30)), 60, 60, Button.ButtonBehavior.Pause, markerSprite, markerSprite);
             int[] randomDegrees = new int[2];
             Random rng = new Random();
             int rngNumb;
@@ -143,14 +146,14 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
             rngNumb = rng.Next(0, 360);
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, rngNumb, rngNumb - 90, 47.4, mercurySprite, tailSprite, sun, graphics);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.8, rngNumb, rngNumb - 90, 38.9, mercurySprite, tailSprite, sun, graphics);
             bodies.Add(mercury);
-            rngNumb = rng.Next(0, 360);
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, sun, graphics);
-            bodies.Add(earth);
-            rngNumb = rng.Next(0, 360);
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, rngNumb - 90, 24.1, marsSprite, tailSprite, sun, graphics);
-            bodies.Add(mars);
+            //rngNumb = rng.Next(0, 360);
+            //Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, sun, graphics);
+            //bodies.Add(earth);
+            //rngNumb = rng.Next(0, 360);
+            //Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, rngNumb - 90, 24.1, marsSprite, tailSprite, sun, graphics);
+            //bodies.Add(mars);
             rngNumb = rng.Next(0, 360);
             Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, rngNumb - 90, 13.1, jupiterSprite, tailSprite, sun, graphics);
             bodies.Add(jupiter);
@@ -202,7 +205,8 @@ namespace ProjectRevolution
                 if (mouse.LeftButton == ButtonState.Pressed)
                 {
                     // Kollar om man tryckt på pausknappen och sparar sedan resultatet i "paus"-variabeln
-                    pause = pauseButton.CheckClick(mouse, mouseHold, pause);
+                    pause = pauseButton.CheckClickPause(mouse, mouseHold, pause);
+                    isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits);
 
                     if (mouseHold == false)
                     { 

@@ -39,7 +39,7 @@ namespace ProjectRevolution
         public string Name { get { return name; } set { this.name = value; } }
         public double Radius { get { return radius; } }
         public bool IsStar { get { return isStar; } }
-        public double ScaleMultiplier { get { return scaleMultiplier; } }
+        public double ScaleMultiplier { get { return scaleMultiplier; } set { scaleMultiplier = value; } }
         
 
         // Denna konstruktor används för stjärnor

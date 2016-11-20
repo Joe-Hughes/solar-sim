@@ -46,10 +46,8 @@ namespace ProjectRevolution
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
-            Console.WriteLine("AngleVector: " + angleVector);
             // Konverterar till meter och förlänger vektorn med korrekt skala givet distansen
             angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
-            Console.WriteLine("Multiplied: " + angleVector);
 
             this.radius = texture.Width / 2;
 
