@@ -35,8 +35,10 @@ namespace ProjectRevolution
                 Console.WriteLine(velocity.ToString());
             }
         }
-
+        
         public Tail Tail { get { return tail; } }
+
+
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
             double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDeviceManager graphicsDevice)
             : base(mass, name, texture, graphicsDevice)

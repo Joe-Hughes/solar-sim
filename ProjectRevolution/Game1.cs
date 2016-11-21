@@ -16,6 +16,7 @@ namespace ProjectRevolution
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        TimeSpan simulationTimeElapsed;
 
         Texture2D planetSprite;
         Texture2D starSprite;
@@ -187,6 +188,8 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
+            TimeSpan simulationTimeSinceLastUpdate = TimeSpan.FromMilliseconds(gameTime.ElapsedGameTime.Milliseconds * Body.timeSpeed);
+            simulationTimeElapsed.Add(simulationTimeSinceLastUpdate);
             if (IrlTotalUpdateTime(gameTime) >= (1 / preferedUPS))
             {
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))

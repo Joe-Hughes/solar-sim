@@ -27,7 +27,7 @@ namespace ProjectRevolution
         // Planet: Nepunus
         public static double scaleMultiplier = Game1.referenceDistanceInMeters / Game1.referenceDistanceInUnits;
 
-        protected double timeSpeed = 1.5 * Math.Pow(10, 6);
+        public static double timeSpeed = 1.5 * Math.Pow(10, 6);
 
         // Newtons konstant, gäller för alla kroppar med massa
         // enhet: Nm^2/kg^2
@@ -40,6 +40,7 @@ namespace ProjectRevolution
         public double Radius { get { return radius; } }
         public bool IsStar { get { return isStar; } }
         public double ScaleMultiplier { get { return scaleMultiplier; } }
+        public double TimeSpeed { get { return timeSpeed; } }
         
 
         // Denna konstruktor används för stjärnor
