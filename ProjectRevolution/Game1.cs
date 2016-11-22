@@ -16,7 +16,9 @@ namespace ProjectRevolution
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        TimeSpan simulationTimeElapsed;
+        TimeSpan realTimeElapsed;
+        // Specifierar hur lång tid som spelet varit pausat så att man kan subtrahera det från TimeElapsed.
+        TimeSpan totalPausedTime;
 
         Texture2D planetSprite;
         Texture2D starSprite;
@@ -94,9 +96,9 @@ namespace ProjectRevolution
 
             // Använd en planet som referensvärden för att få fram meter per positionsenhet.
             // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
-            // Planet: Nepunus
+            // Planet: 
             referenceDistanceInUnits = (graphics.PreferredBackBufferHeight / 2) - 10;
-            referenceDistanceInMeters = 4433.5 * Math.Pow(10, 9);
+            referenceDistanceInMeters = 4495.1 * Math.Pow(10, 9);
 
             drawFrequency = 1 / preferedFPS; // brukade vara 0.02
             updateFrequency = 1 / preferedUPS; // brukade vara 0.01
@@ -165,7 +167,7 @@ namespace ProjectRevolution
             Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, rngNumb, rngNumb - 90, 5.4, neptunusSprite, tailSprite, sun, graphics);
             bodies.Add(neptune);
 
-            menu = new Menu(sun, graphics, arial);
+            menu = new Menu(sun, graphics, arial, realTimeElapsed);
 
             foreach (Body body in bodies)
             {
@@ -188,8 +190,6 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
-            TimeSpan simulationTimeSinceLastUpdate = TimeSpan.FromMilliseconds(gameTime.ElapsedGameTime.Milliseconds * Body.timeSpeed);
-            simulationTimeElapsed.Add(simulationTimeSinceLastUpdate);
             if (IrlTotalUpdateTime(gameTime) >= (1 / preferedUPS))
             {
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -243,11 +243,19 @@ namespace ProjectRevolution
                 // Om spelet inte är pausat, uppdatera planeternas positioner och värden
                 if (!pause)
                 {
+                    // Uppdaterar variabeln som håller koll på hur länge simulationen pågått (minus total paus tid)
+                    realTimeElapsed = gameTime.TotalGameTime.Subtract(totalPausedTime);
+
                     foreach (Planet planet in planets)
                     {
                         planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
                         planet.Tail.AddTailPosition(planet);
                     }
+                }
+                else
+                {
+                    // om programmet är pausat håller denna variabel koll på hur länge.
+                    totalPausedTime = gameTime.TotalGameTime.Subtract(realTimeElapsed);
                 }
 
                 base.Update(gameTime);

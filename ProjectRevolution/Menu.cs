@@ -17,7 +17,7 @@ namespace ProjectRevolution
         private TextBox txtBoxDis;
         private TextBox txtBoxVel;
         private TextBox txtBoxAcc;
-        private TextBox txtBoxForce;
+        private TextBox txtBoxCentriAcc;
 
         private TextBox selected;
 
@@ -26,6 +26,8 @@ namespace ProjectRevolution
         private Body body;
         private Body sun;
         private SpriteFont font;
+        private TimeSpan realTimeElapsed;
+        private TimeSpan simulationTimeElapsed;
 
         public List<TextBox> TxtBoxes { get { return txtBoxes; } }
 
@@ -33,11 +35,12 @@ namespace ProjectRevolution
         public TextBox TxtBoxDis { get { return txtBoxDis; } set { txtBoxDis = value; } }
         public TextBox TxtBoxVel { get { return txtBoxVel; } set { txtBoxVel = value; } }
         public TextBox TxtBoxAcc { get { return txtBoxAcc; } set { txtBoxAcc = value; } }
-        public TextBox TxtBoxForce { get { return txtBoxForce; } set { txtBoxName = value; } }
+        public TextBox TxtTBoxCentriAcc { get { return txtBoxCentriAcc; } set { txtBoxCentriAcc = value; } }
+
         public TextBox Selected { get { return selected; } set { selected = value; } }
         public Body Body { get { return body; } set { this.body = value; } }
 
-        public Menu(Body sun, GraphicsDeviceManager graphics, SpriteFont font)
+        public Menu(Body sun, GraphicsDeviceManager graphics, SpriteFont font, TimeSpan timeElapsed)
         {
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - 324, 0, 324, graphics.PreferredBackBufferHeight);
             horizontalTextPosition = graphics.PreferredBackBufferWidth - menuBackground.Width + 10;
@@ -50,9 +53,12 @@ namespace ProjectRevolution
             this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition, 70), font, false);
             this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition, 110), font, true);
             this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition, 150), font, true);
-            this.txtBoxForce = new TextBox("", new Point(horizontalTextPosition, 190), font, false);
+            this.txtBoxCentriAcc = new TextBox("", new Point(horizontalTextPosition, 190), font, true);
 
-            this.txtBoxes = new List<TextBox> { this.txtBoxName, this.txtBoxDis, this.txtBoxVel, this.txtBoxAcc, this.txtBoxForce };
+            this.txtBoxes = new List<TextBox> { this.txtBoxName, this.txtBoxDis, this.txtBoxVel, this.txtBoxAcc, this.txtBoxCentriAcc};
+
+            realTimeElapsed = timeElapsed;
+            simulationTimeElapsed = TimeSpan.FromMilliseconds(realTimeElapsed.TotalMilliseconds * sun.TimeSpeed);
         }
 
         public void DrawStrings(SpriteBatch spriteBatch)
@@ -71,10 +77,11 @@ namespace ProjectRevolution
                 Planet planet = body as Planet;
 
                 txtBoxName.Text = planet.Name;
-                txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier)).ToString();
+                txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier * 6.68469 * Math.Pow(10, -12)), 3).ToString();
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString();
                 txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString();
-                txtBoxForce.Text = Math.Round(planet.Force, 2).ToString();
+                txtBoxCentriAcc.Text = (Math.Pow(planet.Acceleration, 2) / planet.DetermineDistance(sun)).ToString();
+                
             }
             else
             {

@@ -16,6 +16,7 @@ namespace ProjectRevolution
         private double force; // Enhet: newton
         private double speed; // Hastighet i SI-enheter alltså meter/sekund
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
+
         private Tail tail;
 
         public Vector2 Velocity { get { return velocity; } set { } }
