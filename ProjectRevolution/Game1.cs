@@ -59,8 +59,8 @@ namespace ProjectRevolution
         double oldTotalDrawTime = 0;
 
         // Programvariabler
-        double preferedFPS = 60;
-        double preferedUPS = 2 * 60;
+        double preferedFPS = 30;
+        double preferedUPS = 4 * 60;
         int wait = 0;
 
 
@@ -98,7 +98,7 @@ namespace ProjectRevolution
             // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
             // Planet: 
             referenceDistanceInUnits = (graphics.PreferredBackBufferHeight / 2) - 10;
-            referenceDistanceInMeters = 4495.1 * Math.Pow(10, 9);
+            referenceDistanceInMeters = 1500 * Math.Pow(10, 9);
 
             drawFrequency = 1 / preferedFPS; // brukade vara 0.02
             updateFrequency = 1 / preferedUPS; // brukade vara 0.01
@@ -146,7 +146,7 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
             rngNumb = rng.Next(0, 360);
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 57.9, rngNumb, rngNumb - 90, 47.4, mercurySprite, tailSprite, sun, graphics);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.82, rngNumb, rngNumb - 90, 38.86, mercurySprite, tailSprite, sun, graphics);
             bodies.Add(mercury);
             rngNumb = rng.Next(0, 360);
             Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, sun, graphics);
@@ -216,6 +216,7 @@ namespace ProjectRevolution
                                 if (IsMouseInArea(mouse, textBox.Hitbox.Location, textBox.Hitbox.Height, textBox.Hitbox.Width))
                                 {
                                     pause = true;
+                                    pauseButton.ToggleTexture();
                                     takeKeyboardInput = true;
                                     textBox.Text = "";
                                     menu.Selected = textBox;

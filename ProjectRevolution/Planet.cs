@@ -49,15 +49,20 @@ namespace ProjectRevolution
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
-            Console.WriteLine("AngleVector: " + angleVector);
             // Konverterar till meter och förlänger vektorn med korrekt skala givet distansen
-            angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
-            Console.WriteLine("Multiplied: " + angleVector);
+            double distance = distanceFromStar * Math.Pow(10, 9) / scaleMultiplier;
+            angleVector = Vector2.Multiply(angleVector, Convert.ToSingle(distance));
 
             this.radius = texture.Width / 2;
 
-            double posX = Game1.GetCenter(graphicsDevice).X - star.radius + angleVector.X;
-            double posY = Game1.GetCenter(graphicsDevice).Y - star.radius + angleVector.Y;
+            double radiusOffset = radius;
+            //if (positionAngle > 180 && positionAngle < 360)
+            //{
+            //    radiusOffset *= -1;
+            //}
+
+            double posX = Game1.GetCenter(graphicsDevice).X + radiusOffset + angleVector.X;
+            double posY = Game1.GetCenter(graphicsDevice).Y + radiusOffset - angleVector.Y;
 
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
@@ -70,21 +75,21 @@ namespace ProjectRevolution
         }
 
         //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
-        public Planet(double mass, string name, Vector2 position, Vector2 velocity,
-            Texture2D texture, Body star, GraphicsDeviceManager graphics)
-            : base(mass, name, texture, graphics)
-        {
-            this.isStar = false;
+        //public Planet(double mass, string name, Vector2 position, Vector2 velocity,
+        //    Texture2D texture, Body star, GraphicsDeviceManager graphics)
+        //    : base(mass, name, texture, graphics)
+        //{
+        //    this.isStar = false;
 
-            this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
+        //    this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
 
-            this.radius = texture.Width / 2;
+        //    this.radius = texture.Width / 2;
 
-            double posX = Game1.GetCenter(graphics).X - star.radius + position.X;
-            double posY = Game1.GetCenter(graphics).Y - star.radius + position.Y;
+        //    double posX = Game1.GetCenter(graphics).X - star.radius + position.X;
+        //    double posY = Game1.GetCenter(graphics).Y - star.radius + position.Y;
 
-            this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
-        }
+        //    this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
+        //}
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
         public void updateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)

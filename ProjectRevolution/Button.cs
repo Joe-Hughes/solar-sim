@@ -43,7 +43,7 @@ namespace ProjectRevolution
             this.activeTexture = texture1;
         }
 
-        void ToggleTexture()
+        public void ToggleTexture()
         {
             if (texture2 != null)
             {
