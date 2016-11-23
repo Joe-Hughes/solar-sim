@@ -59,7 +59,7 @@ namespace ProjectRevolution
 
         // Programvariabler
         double preferedFPS = 60;
-        double preferedUPS = 2 * 60;
+        double preferedUPS = 4 * 60;
         int wait = 0;
 
 

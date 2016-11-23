@@ -31,8 +31,6 @@ namespace ProjectRevolution
                 normVelocity.Normalize();
                 this.velocity.X = Convert.ToSingle(V) * normVelocity.X;
                 this.velocity.Y = Convert.ToSingle(V) * normVelocity.Y;
-
-                Console.WriteLine(velocity.ToString());
             }
         }
 
