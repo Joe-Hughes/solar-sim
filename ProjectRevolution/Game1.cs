@@ -80,15 +80,16 @@ namespace ProjectRevolution
         {
             int displayWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             int displayHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            int windowWidth = 1366;
-            int windowHeight = 768;
+            int windowWidth = 1320;
+            int windowHeight = 695;
 
             IsFixedTimeStep = false;    // Låser upp framerate från 30/50/60FPS
             graphics.SynchronizeWithVerticalRetrace = false;    // Stänger av Vsync
             graphics.PreferredBackBufferWidth = windowWidth;   // Spelrutans bredd i pixlar
             graphics.PreferredBackBufferHeight = windowHeight;   // Spelrutans höjd i pixlar
             graphics.IsFullScreen = false;
-            this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
+            //this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
+            this.Window.Position = new Point(0, 0);
 
             graphics.PreferMultiSampling = true;    // Förminskar pixelering på icke-raka linjer
             graphics.ApplyChanges();

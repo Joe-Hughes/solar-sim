@@ -61,8 +61,8 @@ namespace ProjectRevolution
             //    radiusOffset *= -1;
             //}
 
-            double posX = Game1.GetCenter(graphicsDevice).X + radiusOffset + angleVector.X;
-            double posY = Game1.GetCenter(graphicsDevice).Y + radiusOffset - angleVector.Y;
+            double posX = Game1.GetCenter(graphicsDevice).X - radiusOffset + angleVector.X;
+            double posY = Game1.GetCenter(graphicsDevice).Y - radiusOffset + angleVector.Y;
 
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
@@ -70,8 +70,6 @@ namespace ProjectRevolution
             // Skapar en vektor som har en riktning enligt velocityAngle och längd enligt initialVelocity
             Vector2 velocityVector = AngleToVector(velocityAngle);
             this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
-
-            // Skapar all text som komer visas i menyn när denna planet är vald
         }
 
         //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
