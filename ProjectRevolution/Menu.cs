@@ -17,7 +17,11 @@ namespace ProjectRevolution
         private TextBox txtBoxDis;
         private TextBox txtBoxVel;
         private TextBox txtBoxAcc;
-        private TextBox txtBoxForce;
+
+        private TextBox txtBoxDesName;
+        private TextBox txtBoxDesDis;
+        private TextBox txtBoxDesVel;
+        private TextBox txtBoxDesAcc;
 
         private TextBox selected;
 
@@ -33,7 +37,12 @@ namespace ProjectRevolution
         public TextBox TxtBoxDis { get { return txtBoxDis; } set { txtBoxDis = value; } }
         public TextBox TxtBoxVel { get { return txtBoxVel; } set { txtBoxVel = value; } }
         public TextBox TxtBoxAcc { get { return txtBoxAcc; } set { txtBoxAcc = value; } }
-        public TextBox TxtBoxForce { get { return txtBoxForce; } set { txtBoxName = value; } }
+
+        public TextBox TxtBoxDesName { get { return txtBoxDesName; } set { txtBoxDesName = value; } }
+        public TextBox TxtBoxDesDis { get { return txtBoxDesDis; } set { txtBoxDesDis = value; } }
+        public TextBox TxtBoxDesVel { get { return txtBoxDesVel; } set { txtBoxDesVel = value; } }
+        public TextBox TxtBoxDesAcc { get { return txtBoxDesAcc; } set { txtBoxDesAcc = value; } }
+
         public TextBox Selected { get { return selected; } set { selected = value; } }
         public Body Body { get { return body; } set { this.body = value; } }
 
@@ -46,13 +55,27 @@ namespace ProjectRevolution
 
             Planet planet = body as Planet;
 
-            this.txtBoxName = new TextBox("", new Point(horizontalTextPosition, 10), font, false);
-            this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition, 70), font, false);
-            this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition, 110), font, true);
-            this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition, 150), font, true);
-            this.txtBoxForce = new TextBox("", new Point(horizontalTextPosition, 190), font, false);
+            this.txtBoxDesName = new TextBox("Namn: ", new Point(horizontalTextPosition, 10), font, false);
+            this.txtBoxDesDis = new TextBox("Distans till solen: ", new Point(horizontalTextPosition, 70), font, false);
+            this.txtBoxDesVel = new TextBox("Hastighet: ", new Point(horizontalTextPosition, 110), font, false);
+            this.txtBoxDesAcc = new TextBox("Acceleration: ", new Point(horizontalTextPosition, 150), font, false);
 
-            this.txtBoxes = new List<TextBox> { this.txtBoxName, this.txtBoxDis, this.txtBoxVel, this.txtBoxAcc, this.txtBoxForce };
+            this.txtBoxName = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesName.Text).X), 10), font, false);
+            this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesDis.Text).X), 70), font, false);
+            this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesVel.Text).X), 110), font, true);
+            this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesAcc.Text).X), 150), font, false);
+
+            this.txtBoxes = new List<TextBox>
+            {
+                this.txtBoxName,
+                this.txtBoxDis,
+                this.txtBoxVel,
+                this.txtBoxAcc,
+                this.txtBoxDesName,
+                this.txtBoxDesDis,
+                this.txtBoxDesVel,
+                this.txtBoxDesAcc
+            };
         }
 
         public void DrawStrings(SpriteBatch spriteBatch)
@@ -67,14 +90,12 @@ namespace ProjectRevolution
         {
             if (!this.body.IsStar)
             {
-
                 Planet planet = body as Planet;
 
                 txtBoxName.Text = planet.Name;
-                txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier)).ToString();
-                txtBoxVel.Text = Math.Round(planet.Speed).ToString();
-                txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString();
-                txtBoxForce.Text = Math.Round(planet.Force, 2).ToString();
+                txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier)).ToString() + " m";
+                txtBoxVel.Text = Math.Round(planet.Speed).ToString() + " m/s";
+                txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString() + " m/s^2";
             }
             else
             {
