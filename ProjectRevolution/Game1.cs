@@ -19,6 +19,14 @@ namespace ProjectRevolution
 
         Texture2D planetSprite;
         Texture2D starSprite;
+        Texture2D earthSprite;
+        Texture2D marsSprite;
+        Texture2D mercurySprite;
+        Texture2D jupiterSprite;
+        Texture2D neptunusSprite;
+        Texture2D saturnusSprite;
+        Texture2D uranusSprite;
+
         Texture2D tailSprite;
         Texture2D menuSprite;
         Texture2D markerSprite;
@@ -48,8 +56,7 @@ namespace ProjectRevolution
         Menu menu;
         //TextBox selectedTxtBox;
 
-        Body selectedBody;
-        bool isSelectedBody = false;
+        Body selectedBody = null;
 
         KbHandler kbHandler = new KbHandler();
         bool takeKeyboardInput = false;
@@ -79,15 +86,15 @@ namespace ProjectRevolution
         {
             int displayWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             int displayHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            int windowWidth = 1366;
-            int windowHeight = 768;
+            int windowWidth = 1300;   //ska vara 1366x768
+            int windowHeight = 700;
 
             IsFixedTimeStep = false;    // Låser upp framerate från 30/50/60FPS
             graphics.SynchronizeWithVerticalRetrace = false;    // Stänger av Vsync
             graphics.PreferredBackBufferWidth = windowWidth;   // Spelrutans bredd i pixlar
             graphics.PreferredBackBufferHeight = windowHeight;   // Spelrutans höjd i pixlar
             graphics.IsFullScreen = false;
-            this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
+            this.Window.Position = new Point((displayWidth - windowWidth) / 2 - 20, (displayHeight - windowHeight) / 2 - 20);
 
             graphics.PreferMultiSampling = true;    // Förminskar pixelering på icke-raka linjer
             graphics.ApplyChanges();
@@ -117,13 +124,13 @@ namespace ProjectRevolution
 
             starSprite = this.Content.Load<Texture2D>(@"STAR");
             planetSprite = this.Content.Load<Texture2D>(@"earth");
-            Texture2D earthSprite = this.Content.Load<Texture2D>(@"earth");
-            Texture2D marsSprite = this.Content.Load<Texture2D>(@"mars");
-            Texture2D mercurySprite = this.Content.Load<Texture2D>(@"mercury");
-            Texture2D jupiterSprite = this.Content.Load<Texture2D>(@"jupiter");
-            Texture2D neptunusSprite = this.Content.Load<Texture2D>(@"neptunus");
-            Texture2D saturnusSprite = this.Content.Load<Texture2D>(@"saturnus");
-            Texture2D uranusSprite = this.Content.Load<Texture2D>(@"uranus");
+            earthSprite = this.Content.Load<Texture2D>(@"earth");
+            marsSprite = this.Content.Load<Texture2D>(@"mars");
+            mercurySprite = this.Content.Load<Texture2D>(@"mercury");
+            jupiterSprite = this.Content.Load<Texture2D>(@"jupiter");
+            neptunusSprite = this.Content.Load<Texture2D>(@"neptunus");
+            saturnusSprite = this.Content.Load<Texture2D>(@"saturnus");
+            uranusSprite = this.Content.Load<Texture2D>(@"uranus");
 
             tailSprite = this.Content.Load<Texture2D>(@"TAIL");
             menuSprite = this.Content.Load<Texture2D>(@"MENU");
@@ -145,9 +152,9 @@ namespace ProjectRevolution
             // Skapar kroppar och lägger in dem i systemet
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
-            rngNumb = rng.Next(0, 360);
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.8, rngNumb, rngNumb - 90, 38.9, mercurySprite, tailSprite, sun, graphics);
-            bodies.Add(mercury);
+            //rngNumb = rng.Next(0, 360);
+            //Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.8, rngNumb, rngNumb - 90, 38.9, mercurySprite, tailSprite, sun, graphics);
+            //bodies.Add(mercury);
             //rngNumb = rng.Next(0, 360);
             //Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, sun, graphics);
             //bodies.Add(earth);
@@ -155,16 +162,16 @@ namespace ProjectRevolution
             //Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, rngNumb - 90, 24.1, marsSprite, tailSprite, sun, graphics);
             //bodies.Add(mars);
             rngNumb = rng.Next(0, 360);
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, rngNumb - 90, 13.1, jupiterSprite, tailSprite, sun, graphics);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 816.62, rngNumb, rngNumb - 90, 12.44, jupiterSprite, tailSprite, sun, graphics);
             bodies.Add(jupiter);
             rngNumb = rng.Next(0, 360);
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, rngNumb, rngNumb - 90, 9.7, saturnusSprite, tailSprite, sun, graphics);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1514.50, rngNumb, rngNumb - 90, 9.09, saturnusSprite, tailSprite, sun, graphics);
             bodies.Add(saturn);
             rngNumb = rng.Next(0, 360);
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, rngNumb, rngNumb - 90, 6.8, uranusSprite, tailSprite, sun, graphics);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 3003.62, rngNumb, rngNumb - 90, 6.49, uranusSprite, tailSprite, sun, graphics);
             bodies.Add(uranus);
             rngNumb = rng.Next(0, 360);
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, rngNumb, rngNumb - 90, 5.4, neptunusSprite, tailSprite, sun, graphics);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4545.67, rngNumb, rngNumb - 90, 5.37, neptunusSprite, tailSprite, sun, graphics);
             bodies.Add(neptune);
 
             menu = new Menu(sun, graphics, arial);
@@ -206,20 +213,24 @@ namespace ProjectRevolution
                 {
                     // Kollar om man tryckt på pausknappen och sparar sedan resultatet i "paus"-variabeln
                     pause = pauseButton.CheckClickPause(mouse, mouseHold, pause);
-                    isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits);
+                    //isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits);
 
                     if (mouseHold == false)
                     { 
-                        if (isSelectedBody)
+                        if (selectedBody != null)
                         {
                             foreach (TextBox textBox in menu.TxtBoxes)
                             {
-                                if (IsMouseInArea(mouse, textBox.Hitbox.Location, textBox.Hitbox.Height, textBox.Hitbox.Width))
+                                if (textBox.Edit)
                                 {
-                                    pause = true;
-                                    takeKeyboardInput = true;
-                                    textBox.Text = "";
-                                    menu.Selected = textBox;
+                                    if (IsMouseInArea(mouse, textBox.Hitbox.Location, textBox.Hitbox.Height, textBox.Hitbox.Width))
+                                    {
+                                        pause = true;
+                                        pauseButton.ToggleTexture();
+                                        takeKeyboardInput = true;
+                                        textBox.Text = "";
+                                        menu.Selected = textBox;
+                                    }
                                 }
                             }
                         }
@@ -229,7 +240,6 @@ namespace ProjectRevolution
                         if (IsMouseInArea(mouse, body.Position.ToPoint(), body.radius * 2, body.radius * 2))
                         {
                             selectedBody = body;
-                            isSelectedBody = true;
                             menu.Body = body;
                         }
                     }
@@ -311,7 +321,7 @@ namespace ProjectRevolution
                 if (wait >= 5)
                 {
                     wait = 0;
-                    if (isSelectedBody)
+                    if (selectedBody != null)
                     {
                         if (!pause)
                         {
@@ -366,6 +376,39 @@ namespace ProjectRevolution
             int degrees = rng.Next(0, 320);
             int[] values = new int[2] { degrees, degrees - 90 };
             return values;
+        }
+
+        public void SpawnInnerSystem()
+        {
+            Random rng = new Random();
+            int rngNumb;
+            rngNumb = rng.Next(0, 360);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.8, rngNumb, rngNumb - 90, 38.9, mercurySprite, tailSprite, planets[0], graphics);
+            bodies[1] = mercury;
+            rngNumb = rng.Next(0, 360);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, planets[0], graphics);
+            bodies[2] = earth;
+            rngNumb = rng.Next(0, 360);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, rngNumb - 90, 24.1, marsSprite, tailSprite, planets[0], graphics);
+            bodies[3] = mars;
+        }
+
+        public void SpawnOuterSystem()
+        {
+            Random rng = new Random();
+            int rngNumb;
+            rngNumb = rng.Next(0, 360);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, rngNumb - 90, 13.1, jupiterSprite, tailSprite, planets[0], graphics);
+            bodies.Add(jupiter);
+            rngNumb = rng.Next(0, 360);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, rngNumb, rngNumb - 90, 9.7, saturnusSprite, tailSprite, planets[0], graphics);
+            bodies.Add(saturn);
+            rngNumb = rng.Next(0, 360);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, rngNumb, rngNumb - 90, 6.8, uranusSprite, tailSprite, planets[0], graphics);
+            bodies.Add(uranus);
+            rngNumb = rng.Next(0, 360);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, rngNumb, rngNumb - 90, 5.4, neptunusSprite, tailSprite, planets[0], graphics);
+            bodies.Add(neptune);
         }
     }
 }
