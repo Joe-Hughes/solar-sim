@@ -78,11 +78,23 @@ namespace ProjectRevolution
             };
         }
 
-        public void DrawStrings(SpriteBatch spriteBatch)
+        public void DrawStrings(SpriteBatch spriteBatch, Body body)
         {
-            foreach(TextBox txtBox in txtBoxes)
+            if (body != null)
             {
-                spriteBatch.DrawString(font, txtBox.Text, txtBox.Hitbox.Location.ToVector2(), Color.Black);
+                if (body.IsStar)
+                {
+                    spriteBatch.DrawString(font, txtBoxName.Text, txtBoxName.Hitbox.Location.ToVector2(), Color.Black);
+                    spriteBatch.DrawString(font, txtBoxDesName.Text, txtBoxDesName.Hitbox.Location.ToVector2(), Color.Black);
+                }
+
+                else
+                {
+                    foreach (TextBox txtBox in txtBoxes)
+                    {
+                        spriteBatch.DrawString(font, txtBox.Text, txtBox.Hitbox.Location.ToVector2(), Color.Black);
+                    }
+                }
             }
         }
 
@@ -93,6 +105,11 @@ namespace ProjectRevolution
                 Planet planet = body as Planet;
 
                 txtBoxName.Text = planet.Name;
+                txtBoxDesName.Text = "Namn: ";
+                txtBoxDesDis.Text = "Distans till solen: ";
+                txtBoxDesVel.Text = "Hastighet: ";
+                txtBoxDesAcc.Text = "Acceleration: ";
+
                 txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier)).ToString() + " m";
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString() + " m/s";
                 txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString() + " m/s^2";

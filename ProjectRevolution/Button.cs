@@ -69,24 +69,54 @@ namespace ProjectRevolution
             return pause;
         }
 
-        public bool CheckClickZoom(MouseState mouse, bool mouseHold, bool isZoomedOut , double referenceDistanceInUnits)
+        //Zoom button behavior
+        public bool CheckClickZoom(MouseState mouse, bool mouseHold, bool isZoomedOut , double referenceDistanceInUnits, List<Planet> planets, GraphicsDeviceManager graphicsDeviceManager)
         {
+            //Kollar om mus är i arean av knappen
             if (!mouseHold && Game1.IsMouseInArea(mouse, buttonArea.Location, buttonArea.Height, buttonArea.Width))
             {
                 double referenceDistanceInMeters;
+                double newScaleMultiplier;
+                Vector2 center = Game1.GetCenter(graphicsDeviceManager);
 
+                //kollar om det är in eller ut zoomat när knappen trycks
                 if (isZoomedOut)
                 {
-                    referenceDistanceInMeters = 227.9 * Math.Pow(10, 9);
-                    Body.scaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
+                    referenceDistanceInMeters = 3000 * Math.Pow(10, 9);
+                    newScaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
+                    
+                    //Går igenom alla planter och ändrar deras positioner och hastigheter med den nya skalan
+                    foreach (Planet planet in planets)
+                    {
+                        float differenceX = planet.Position.X - center.X;
+                        float differenceY = planet.Position.Y - center.Y;
+
+                        planet.Velocity = new Vector2(Convert.ToSingle((planet.Velocity.X * Body.scaleMultiplier) / newScaleMultiplier),
+                            Convert.ToSingle((planet.Velocity.Y * Body.scaleMultiplier) / newScaleMultiplier));
+                        
+                        planet.Position = new Vector2(Convert.ToSingle(center.X + (differenceX * Body.scaleMultiplier) / newScaleMultiplier), 
+                            Convert.ToSingle(center.Y + (differenceY * Body.scaleMultiplier) / newScaleMultiplier));
+                    }
                     isZoomedOut = false;
                 }
                 else
                 {
                     referenceDistanceInMeters = 4433.5 * Math.Pow(10, 9);
-                    Body.scaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
+                    newScaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
+                    foreach (Planet planet in planets)
+                    {
+                        float differenceX = planet.Position.X - center.X;
+                        float differenceY = planet.Position.Y - center.Y;
+
+                        planet.Velocity = new Vector2(Convert.ToSingle((planet.Velocity.X * Body.scaleMultiplier) / newScaleMultiplier),
+                            Convert.ToSingle((planet.Velocity.Y * Body.scaleMultiplier) / newScaleMultiplier));
+
+                        planet.Position = new Vector2(Convert.ToSingle(center.X + (differenceX * Body.scaleMultiplier) / newScaleMultiplier),
+                            Convert.ToSingle(center.Y + (differenceY * Body.scaleMultiplier) / newScaleMultiplier));
+                    }
                     isZoomedOut = true;
                 }
+                Body.scaleMultiplier = newScaleMultiplier;
             }
             return isZoomedOut;
         }

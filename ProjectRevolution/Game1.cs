@@ -213,7 +213,7 @@ namespace ProjectRevolution
                 {
                     // Kollar om man tryckt på pausknappen och sparar sedan resultatet i "paus"-variabeln
                     pause = pauseButton.CheckClickPause(mouse, mouseHold, pause);
-                    //isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits);
+                    isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits, planets, graphics);
 
                     if (mouseHold == false)
                     { 
@@ -333,7 +333,8 @@ namespace ProjectRevolution
                 {
                     wait++;
                 }
-                menu.DrawStrings(spriteBatch);
+
+                menu.DrawStrings(spriteBatch, selectedBody);
                 spriteBatch.End();
                 oldTotalDrawTime = gameTime.TotalGameTime.TotalSeconds;
                 base.Draw(gameTime);

@@ -33,7 +33,7 @@ namespace ProjectRevolution
         // enhet: Nm^2/kg^2
         protected double gravConstant = 6.67408 * Math.Pow(10, -11);
 
-        public Vector2 Position { get { return position; } }
+        public Vector2 Position { get { return position; } set { position = value; } }
         public double Mass { get { return mass; } }
         public Texture2D Texture { get { return texture; } }
         public string Name { get { return name; } set { this.name = value; } }

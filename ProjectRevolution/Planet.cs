@@ -18,7 +18,7 @@ namespace ProjectRevolution
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
         private Tail tail;
 
-        public Vector2 Velocity { get { return velocity; } set { } }
+        public Vector2 Velocity { get { return velocity; } set { velocity = value; } }
         public double Acceleration { get { return acceleration; } }
         public double Force { get { return force; } }
         public double Speed
@@ -136,7 +136,7 @@ namespace ProjectRevolution
         {
             double degrees = Math.Atan2(-vector.Y, vector.X);
             //double degrees = MathHelper.ToDegrees(Convert.ToSingle(radians));
-            // don't ask
+            //don't ask
             degrees = (degrees > 0 ? degrees : (2 * Math.PI + degrees)) * 360 / (2 * Math.PI);
             return Convert.ToSingle(degrees);
         }
