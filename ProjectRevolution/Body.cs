@@ -15,7 +15,7 @@ namespace ProjectRevolution
         protected Vector2 position; // enhet: positioner (inte meter eller pixlar)
         protected double mass; // enhet: kilogram
         protected string name;
-        protected internal double radius; // Texturens radie, enhet: pixlar
+        protected internal int radius; // Texturens radie, enhet: pixlar
         protected Texture2D texture;
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
@@ -82,6 +82,26 @@ namespace ProjectRevolution
             double hypotenuse = (Math.Sqrt(Math.Pow(xDistance, 2) + Math.Pow(yDistance, 2)));
 
             return hypotenuse;
+        }
+
+        public static bool DetectCollision(List<Body> bodies)
+        {
+            // Kollar om det finns några planeter som är tillräckligt nära för att kollidera
+            foreach (Body body in bodies)
+            {
+                foreach (Body otherBody in bodies)
+                {
+                    if (otherBody != body)
+                    {
+                        int radii = body.radius + otherBody.radius;
+                        if (Body.DetermineDistance(body.Position, otherBody) < radii)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public static void UpdateTimeSpeed(int speed)

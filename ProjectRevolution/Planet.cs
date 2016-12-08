@@ -45,7 +45,7 @@ namespace ProjectRevolution
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
-            tail = new Tail(this.name, texture.Width/2, tailTexture, 150, graphicsDevice); // Tar bort tails efter x grader
+            tail = new Tail(this.name, texture.Width/2, tailTexture, 140, graphicsDevice); // Tar bort tails efter x grader
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
@@ -90,7 +90,8 @@ namespace ProjectRevolution
         //}
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
-        public void updateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
+
+        public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
         {
             Vector2 velocityVector = new Vector2();
 
@@ -126,8 +127,8 @@ namespace ProjectRevolution
             // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen och beräknas utifrån den
             this.velocity += velocityVector;
 
-            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
-            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
+            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
 
             speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
             acceleration = (speed - oldSpeed) / totalSecondsSinceUpdate;
@@ -149,11 +150,6 @@ namespace ProjectRevolution
             // don't ask
             degrees = (degrees > 0 ? degrees : (2 * Math.PI + degrees)) * 360 / (2 * Math.PI);
             return Convert.ToSingle(degrees);
-        }
-
-        public void ChangeSpeed(double V)
-        {
-            
         }
     }
 }

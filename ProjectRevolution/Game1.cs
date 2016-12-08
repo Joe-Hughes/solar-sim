@@ -56,6 +56,8 @@ namespace ProjectRevolution
 
         Body selectedBody;
         bool isSelectedBody = false;
+        bool physicsBroken = false;
+        bool promtedAboutCollision = false;
 
         KbHandler kbHandler = new KbHandler();
         bool takeKeyboardInput = false;
@@ -65,7 +67,7 @@ namespace ProjectRevolution
 
         // Programvariabler
         double preferedFPS = 30;
-        double preferedUPS = 4 * 60;
+        double preferedUPS = 10 * 60;
         int wait = 0;
 
 
@@ -269,8 +271,24 @@ namespace ProjectRevolution
 
                     foreach (Planet planet in planets)
                     {
-                        planet.updateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
-                        planet.Tail.AddTailPosition(planet);
+                        bool collisionDetected = false;
+                        if (!physicsBroken)
+                        {
+                            if (Body.DetectCollision(bodies))
+                            {
+                                collisionDetected = true;
+                                physicsBroken = true;
+                                promtedAboutCollision = true;
+                                simulationSpeed = 0;
+                            }
+                        }
+
+                        // Om det inte skett en kollision, uppdatera planeternas positioner igen.
+                        if (!collisionDetected)
+                        {
+                            planet.UpdateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                            planet.Tail.AddTailPosition(planet);
+                        }
                     }
                 }
                 else
@@ -355,6 +373,24 @@ namespace ProjectRevolution
                     wait++;
                 }
                 menu.DrawStrings(spriteBatch);
+
+                if (physicsBroken && !promtedAboutCollision)
+                {
+                    int width = 100;
+                    int height = 50;
+                    Vector2 centerScreen = GetCenter(graphics);
+                    int xPosition = Convert.ToInt32(centerScreen.X - (width / 2));
+                    int yPosition = Convert.ToInt32(centerScreen.Y - (height / 2));
+                    Rectangle collisionPrompt = new Rectangle(xPosition, yPosition, width, height);
+                    spriteBatch.Draw(menuSprite, null, collisionPrompt);
+
+                    string collisionText = "WARNING: Kollision detekterad!";
+                    Vector2 textPosition = Vector2.Add(collisionPrompt.Location.ToVector2(), new Vector2(10));
+                    spriteBatch.DrawString(arial, collisionText, textPosition, Color.Black);
+
+                    promtedAboutCollision = true;
+                }
+
                 spriteBatch.End();
                 oldTotalDrawTime = gameTime.TotalGameTime.TotalSeconds;
                 base.Draw(gameTime);
