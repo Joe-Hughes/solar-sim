@@ -67,7 +67,7 @@ namespace ProjectRevolution
 
         // Programvariabler
         double preferedFPS = 30;
-        double preferedUPS = 10 * 60;
+        double preferedUPS = 4 * 60;
         int wait = 0;
 
 
@@ -106,10 +106,10 @@ namespace ProjectRevolution
             // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
             // Planet: 
             referenceDistanceInUnits = (graphics.PreferredBackBufferHeight / 2) - 10;
-            referenceDistanceInMeters = 1500 * Math.Pow(10, 9);
+            referenceDistanceInMeters = 227.9 * Math.Pow(10, 9);
 
-            drawFrequency = 1 / preferedFPS; // brukade vara 0.02
-            updateFrequency = 1 / preferedUPS; // brukade vara 0.01
+            drawFrequency = 1 / preferedFPS;
+            updateFrequency = 1 / preferedUPS;
 
             base.Initialize();
         }
@@ -229,6 +229,10 @@ namespace ProjectRevolution
                     simulationSpeed = playButton.CheckClick(mouse, mouseHold, simulationSpeed);
                     simulationSpeed = playButton2.CheckClick(mouse, mouseHold, simulationSpeed);
                     simulationSpeed = playButton3.CheckClick(mouse, mouseHold, simulationSpeed);
+                    if (simulationSpeed > 0 && physicsBroken && !promtedAboutCollision)
+                    {
+                        promtedAboutCollision = true;
+                    }
 
                     if (mouseHold == false)
                     { 
@@ -248,7 +252,7 @@ namespace ProjectRevolution
                     }
                     foreach (Body body in bodies)
                     {
-                        if (IsMouseInArea(mouse, body.Position.ToPoint(), body.radius * 2, body.radius * 2))
+                        if (IsMouseInArea(mouse, body.SpritePosition.ToPoint(), body.radius * 2, body.radius * 2))
                         {
                             selectedBody = body;
                             isSelectedBody = true;
@@ -271,6 +275,8 @@ namespace ProjectRevolution
 
                     foreach (Planet planet in planets)
                     {
+                        // Kollar om någon av kropparna kolliderat med varandra.
+                        // Promptar sedan användaren när det händer första gången och frågar om den vill fortsätta.
                         bool collisionDetected = false;
                         if (!physicsBroken)
                         {
@@ -278,7 +284,6 @@ namespace ProjectRevolution
                             {
                                 collisionDetected = true;
                                 physicsBroken = true;
-                                promtedAboutCollision = true;
                                 simulationSpeed = 0;
                             }
                         }
@@ -322,23 +327,18 @@ namespace ProjectRevolution
                         Tail tail = planet.Tail;
                         foreach (Vector2 position in tail.GetTailPositions())
                         {
-                            spriteBatch.Draw(tail.Texture, Vector2.Add(position, new Vector2(Convert.ToSingle(planet.radius))));
+                            spriteBatch.Draw(tail.Texture, position);
                         }
                     }
 
                     // Ritar själva kroppen
-                    spriteBatch.Draw(body.Texture, body.Position);
+                    spriteBatch.Draw(body.Texture, body.SpritePosition);
 
-                    // Ritar markören om kroppe är markerad
-                    if (body == selectedBody)
-
-                    // Ritar själva kroppen
-                    spriteBatch.Draw(body.Texture, body.Position);  
-
-                    // Ritar markören om kroppe är markerad
+                    // Ritar markören om kroppen är markerad
                     if (body == selectedBody)
                     {
-                        spriteBatch.Draw(markerSprite, new Vector2(Convert.ToSingle(body.Position.X + body.radius - 11), Convert.ToSingle(body.Position.Y + body.radius - 11)));
+                        spriteBatch.Draw(markerSprite, Vector2.Subtract(body.Position, new Vector2(markerSprite.Width / 2)));
+
                     }
                 }
 
@@ -376,19 +376,25 @@ namespace ProjectRevolution
 
                 if (physicsBroken && !promtedAboutCollision)
                 {
-                    int width = 100;
-                    int height = 50;
+                    int width = 275;
+                    int height = 75;
                     Vector2 centerScreen = GetCenter(graphics);
                     int xPosition = Convert.ToInt32(centerScreen.X - (width / 2));
                     int yPosition = Convert.ToInt32(centerScreen.Y - (height / 2));
                     Rectangle collisionPrompt = new Rectangle(xPosition, yPosition, width, height);
                     spriteBatch.Draw(menuSprite, null, collisionPrompt);
 
-                    string collisionText = "WARNING: Kollision detekterad!";
-                    Vector2 textPosition = Vector2.Add(collisionPrompt.Location.ToVector2(), new Vector2(10));
-                    spriteBatch.DrawString(arial, collisionText, textPosition, Color.Black);
+                    string[] collisionText = {
+                        "WARNING: Kollision detekterad!",
+                        "Simulationen agerar nu ofysikaliskt."
+                        //"Tryck på Spela-knappen för att fortsätta"
+                    };
 
-                    promtedAboutCollision = true;
+                    for (int i = 0; i < collisionText.Length; i++)
+                    {
+                        Vector2 textPosition = Vector2.Add(collisionPrompt.Location.ToVector2(), new Vector2(14, 22 + 16 * i));
+                        spriteBatch.DrawString(arial, collisionText[i], textPosition, Color.Black);
+                    }
                 }
 
                 spriteBatch.End();

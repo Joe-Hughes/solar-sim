@@ -77,10 +77,10 @@ namespace ProjectRevolution
                 Planet planet = body as Planet;
 
                 txtBoxName.Text = planet.Name;
-                txtBoxDis.Text = Math.Round((planet.DetermineDistance(sun) * planet.ScaleMultiplier * 6.68469 * Math.Pow(10, -12)), 3).ToString();
+                txtBoxDis.Text = Math.Round((Body.DetermineDistance(planet, sun) * planet.ScaleMultiplier * 6.68469 * Math.Pow(10, -12)), 3).ToString();
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString();
                 txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString();
-                txtBoxCentriAcc.Text = (Math.Pow(planet.Acceleration, 2) / planet.DetermineDistance(sun)).ToString();
+                txtBoxCentriAcc.Text = (Math.Pow(planet.Acceleration, 2) / Body.DetermineDistance(planet, sun)).ToString();
                 
             }
             else
