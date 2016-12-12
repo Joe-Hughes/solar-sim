@@ -33,6 +33,7 @@ namespace ProjectRevolution
         Texture2D txtBoxSprite;
         Texture2D pauseBtnSprite;
         Texture2D playBtnSprite;
+        Texture2D zoomBtnSprite;
 
         Button pauseButton;
         Button zoomButton;
@@ -112,10 +113,6 @@ namespace ProjectRevolution
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -138,6 +135,7 @@ namespace ProjectRevolution
             txtBoxSprite = this.Content.Load<Texture2D>(@"TXTBOX");
             pauseBtnSprite = this.Content.Load<Texture2D>(@"PauseBtn");
             playBtnSprite = this.Content.Load<Texture2D>(@"PlayBtn");
+            zoomBtnSprite = this.Content.Load<Texture2D>(@"ZoomBtn");
             arial = this.Content.Load<SpriteFont>("StandardArial");
 
             // Ritar grundläggande UI-element
@@ -145,10 +143,11 @@ namespace ProjectRevolution
             menuBackground = new Rectangle(graphics.PreferredBackBufferWidth - menuWidth, 0, menuWidth, graphics.PreferredBackBufferHeight);
             pauseButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width,
                 graphics.PreferredBackBufferHeight - 50), 100, 50, Button.ButtonBehavior.Pause, pauseBtnSprite, playBtnSprite);
-            zoomButton = new Button(Vector2.Add(GetCenter(graphics), new Vector2(-30, -30)), 60, 60, Button.ButtonBehavior.Pause, markerSprite, markerSprite);
+            zoomButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width - 70, 0), 70, 50, Button.ButtonBehavior.Pause, zoomBtnSprite, zoomBtnSprite);
             int[] randomDegrees = new int[2];
             Random rng = new Random();
             int rngNumb;
+
             // Skapar kroppar och lägger in dem i systemet
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
             bodies.Add(sun);
@@ -311,6 +310,8 @@ namespace ProjectRevolution
 
                 // Ritar pausknappen
                 spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
+
+                spriteBatch.Draw(zoomButton.Texture, zoomButton.Location.ToVector2());
 
                 // Ritar debugmätarna för FPS och UPS
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
