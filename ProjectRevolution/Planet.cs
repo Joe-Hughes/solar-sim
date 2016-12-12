@@ -16,6 +16,7 @@ namespace ProjectRevolution
         private double force; // Enhet: newton
         private double speed; // Hastighet i SI-enheter alltså meter/sekund
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
+
         private Tail tail;
 
         public Vector2 Velocity { get { return velocity; } set { velocity = value; } }
@@ -33,24 +34,25 @@ namespace ProjectRevolution
                 this.velocity.Y = Convert.ToSingle(V) * normVelocity.Y;
             }
         }
-
+        
         public Tail Tail { get { return tail; } }
+
+
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
             double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDeviceManager graphicsDevice)
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
-            tail = new Tail(this.name, texture.Width/2, tailTexture, 160, graphicsDevice); // Tar bort tails efter 340 grader
+            tail = new Tail(this.name, texture.Width/2, tailTexture, 140, graphicsDevice); // Tar bort tails efter x grader
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
             // Konverterar till meter och förlänger vektorn med korrekt skala givet distansen
-            angleVector = Vector2.Multiply(angleVector, Convert.ToSingle((distanceFromStar * Math.Pow(10,9)) / scaleMultiplier));
+            double distance = distanceFromStar * Math.Pow(10, 9) / scaleMultiplier;
+            angleVector = Vector2.Multiply(angleVector, Convert.ToSingle(distance));
 
-            this.radius = texture.Width / 2;
-
-            double posX = Game1.GetCenter(graphicsDevice).X - star.radius + angleVector.X;
-            double posY = Game1.GetCenter(graphicsDevice).Y - star.radius + angleVector.Y;
+            double posX = Game1.GetCenter(graphicsDevice).X + angleVector.X;
+            double posY = Game1.GetCenter(graphicsDevice).Y + angleVector.Y;
 
             Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
             this.position = initPosition;
@@ -58,29 +60,26 @@ namespace ProjectRevolution
             // Skapar en vektor som har en riktning enligt velocityAngle och längd enligt initialVelocity
             Vector2 velocityVector = AngleToVector(velocityAngle);
             this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
-
-            // Skapar all text som komer visas i menyn när denna planet är vald
         }
 
         //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
-        public Planet(double mass, string name, Vector2 position, Vector2 velocity,
-            Texture2D texture, Body star, GraphicsDeviceManager graphics)
-            : base(mass, name, texture, graphics)
-        {
-            this.isStar = false;
+        //public Planet(double mass, string name, Vector2 position, Vector2 velocity,
+        //    Texture2D texture, Body star, GraphicsDeviceManager graphics)
+        //    : base(mass, name, texture, graphics)
+        //{
+        //    this.isStar = false;
 
-            this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
+        //    this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
 
-            this.radius = texture.Width / 2;
+        //    double posX = Game1.GetCenter(graphics).X + position.X;
+        //    double posY = Game1.GetCenter(graphics).Y + position.Y;
 
-            double posX = Game1.GetCenter(graphics).X - star.radius + position.X;
-            double posY = Game1.GetCenter(graphics).Y - star.radius + position.Y;
-
-            this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
-        }
+        //    this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
+        //}
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
-        public void updateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
+
+        public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
         {
             Vector2 velocityVector = new Vector2();
 
@@ -90,14 +89,14 @@ namespace ProjectRevolution
                 {
 
                     // radien behöver adderas på båda distanserna då positionen tas från det över vänstra hörnet av kroppen.
-                    double xDistance = (otherBody.Position.X + otherBody.radius) - (this.position.X + this.radius);
-                    double yDistance = (otherBody.Position.Y + otherBody.radius) - (this.position.Y + this.radius);
+                    double xDistance = otherBody.Position.X - this.position.X;
+                    double yDistance = otherBody.Position.Y - this.position.Y;
 
                     Vector2 direction = new Vector2(Convert.ToSingle(xDistance), Convert.ToSingle(yDistance));
                     direction.Normalize();
 
                     // gravitationslagen F = G * (m*M / r^2)
-                    force = this.gravConstant * ((this.mass * otherBody.Mass) / Math.Pow(DetermineDistance(otherBody) * scaleMultiplier, 2));
+                    force = this.gravConstant * ((this.mass * otherBody.Mass) / Math.Pow(DetermineDistance(this, otherBody) * scaleMultiplier, 2));
                     // beräkna accelerationen genom a = F / m
                     double appliedAcceleration = force / this.mass;
                     // beräkna hastighet genom v = a * t
@@ -116,8 +115,9 @@ namespace ProjectRevolution
             // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen och beräknas utifrån den
             this.velocity += velocityVector;
 
-            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
-            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed - this.radius);
+            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+            this.spritePosition = Vector2.Subtract(position, new Vector2(radius));
 
             speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
             acceleration = (speed - oldSpeed) / totalSecondsSinceUpdate * timeSpeed;
@@ -139,11 +139,6 @@ namespace ProjectRevolution
             //don't ask
             degrees = (degrees > 0 ? degrees : (2 * Math.PI + degrees)) * 360 / (2 * Math.PI);
             return Convert.ToSingle(degrees);
-        }
-
-        public void ChangeSpeed(double V)
-        {
-            
         }
     }
 }

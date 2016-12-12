@@ -40,6 +40,11 @@ namespace ProjectRevolution
             tailPositions.Add(planet.Position);
         }
 
+        public static void ClearTailPositions(Planet planet)
+        {
+            planet.Tail.tailPositions.Clear();
+        }
+
         // Uppdaterar listan tailPositions och returnerar den
         public List<Vector2> GetTailPositions()
         {

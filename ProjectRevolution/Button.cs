@@ -15,7 +15,7 @@ namespace ProjectRevolution
         private Texture2D texture1;
         private Texture2D texture2;
         private Texture2D activeTexture;
-        private ButtonBehavior behavior;
+        private int simulationSpeed;
 
         public Point Location { get { return buttonArea.Location; } }
         public Rectangle ButtonArea { get { return buttonArea; } }
@@ -23,18 +23,27 @@ namespace ProjectRevolution
         public int Width { get { return buttonArea.Width; } }
         public Texture2D Texture { get { return activeTexture; } }
 
-        public enum ButtonBehavior
-        {
-            Pause
-        };
-
-        public Button(Vector2 position, int width, int height, ButtonBehavior behavior, Texture2D buttonTexture, 
+        public Button(Vector2 position, int width, int height, Texture2D buttonTexture, 
             Texture2D toggleTexture=null)
         {
             this.buttonArea.Width = width;
             this.buttonArea.Height = height;
             this.buttonArea.Location = position.ToPoint();
-            this.behavior = behavior;
+            this.texture1 = buttonTexture;
+            if (toggleTexture != null)
+            {
+                texture2 = toggleTexture;
+            }
+            this.activeTexture = texture1;
+        }
+
+        public Button(Vector2 position, int width, int height, int simulationSpeed, Texture2D buttonTexture,
+    Texture2D toggleTexture = null)
+        {
+            this.buttonArea.Width = width;
+            this.buttonArea.Height = height;
+            this.buttonArea.Location = position.ToPoint();
+            this.simulationSpeed = simulationSpeed;
             this.texture1 = buttonTexture;
             if (toggleTexture != null)
             {
@@ -59,14 +68,16 @@ namespace ProjectRevolution
         }
 
         // click for Pause behavior
-        public bool CheckClickPause(MouseState mouse, bool mouseHold, bool pause)
+        public int CheckClick(MouseState mouse, bool mouseHold, int currentSimulationSpeed)
         {
             if (!mouseHold && Game1.IsMouseInArea(mouse, buttonArea.Location, buttonArea.Height, buttonArea.Width))
             {
-                pause = !pause;
-                ToggleTexture();
+                return this.simulationSpeed;
             }
-            return pause;
+            else
+            {
+                return currentSimulationSpeed;
+            }
         }
 
         //Zoom button behavior
@@ -82,7 +93,7 @@ namespace ProjectRevolution
                 //kollar om det är in eller ut zoomat när knappen trycks
                 if (isZoomedOut)
                 {
-                    referenceDistanceInMeters = 3000 * Math.Pow(10, 9);
+                    referenceDistanceInMeters = 227.9 * Math.Pow(10, 9);
                     newScaleMultiplier = referenceDistanceInMeters / referenceDistanceInUnits;
                     
                     //Går igenom alla planter och ändrar deras positioner och hastigheter med den nya skalan
@@ -117,6 +128,10 @@ namespace ProjectRevolution
                     isZoomedOut = true;
                 }
                 Body.scaleMultiplier = newScaleMultiplier;
+                foreach (Planet planet in planets)
+                {
+                    Tail.ClearTailPositions(planet);
+                }
             }
             return isZoomedOut;
         }

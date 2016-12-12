@@ -13,9 +13,10 @@ namespace ProjectRevolution
     class Body
     {
         protected Vector2 position; // enhet: positioner (inte meter eller pixlar)
+        protected Vector2 spritePosition;
         protected double mass; // enhet: kilogram
         protected string name;
-        protected internal double radius; // Texturens radie, enhet: pixlar
+        protected internal int radius; // Texturens radie, enhet: pixlar
         protected Texture2D texture;
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
@@ -27,19 +28,21 @@ namespace ProjectRevolution
         // Planet: Nepunus
         public static double scaleMultiplier = Game1.referenceDistanceInMeters / Game1.referenceDistanceInUnits;
 
-        protected double timeSpeed = 1.5 * Math.Pow(10, 6);
+        public static double timeSpeed;
 
         // Newtons konstant, gäller för alla kroppar med massa
         // enhet: Nm^2/kg^2
         protected double gravConstant = 6.67408 * Math.Pow(10, -11);
 
         public Vector2 Position { get { return position; } set { position = value; } }
+        public Vector2 SpritePosition { get { return spritePosition; } }
         public double Mass { get { return mass; } }
         public Texture2D Texture { get { return texture; } }
         public string Name { get { return name; } set { this.name = value; } }
         public double Radius { get { return radius; } }
         public bool IsStar { get { return isStar; } }
         public double ScaleMultiplier { get { return scaleMultiplier; } set { scaleMultiplier = value; } }
+        public double TimeSpeed { get { return timeSpeed; } }
         
 
         // Denna konstruktor används för stjärnor
@@ -51,36 +54,55 @@ namespace ProjectRevolution
             this.texture = texture;
 
             // Sätter stjärnan i mitten av skärmen genom att ta skärmstorleken och dela på två
-            this.position.X = Convert.ToSingle(Game1.GetCenter(graphics).X - radius);
-            this.position.Y = Convert.ToSingle(Game1.GetCenter(graphics).Y - radius);
+            this.position = Game1.GetCenter(graphics);
+            this.spritePosition = Vector2.Subtract(position, new Vector2(radius));
         }
 
-        // returnerar distansen mellan denna och en annan kropp genom Pytagoras sats
-        // enhet: positioner (INTE meter)
-        public double DetermineDistance(Body otherBody)
-        {
-            double radius1 = this.radius;
-            double radius2 = otherBody.radius;
-
-            // radien behöver adderas på båda distanserna då positionen tas från det över vänstra hörnet av kroppen.
-            double xDistance = (otherBody.position.X + radius2) - (this.position.X + radius1);
-            double yDistance = (otherBody.position.Y + radius2) - (this.position.Y + radius1);
-
-            double hypotenuse = (Math.Sqrt(Math.Pow(xDistance, 2) + Math.Pow(yDistance, 2)));
-
-            return hypotenuse;
-        }
         // Statisk Overload-funktion för när man behöver veta distansen mellan en viss punkt och en kropp.
         // enhet: positioner (INTE meter)
-        public static double DetermineDistance(Vector2 position,Body otherBody)
+        public static double DetermineDistance(Body body, Body otherBody)
         {
-            // radien behöver adderas på distansen då positionen tas från det över vänstra hörnet av kroppen.
-            double xDistance = (otherBody.position.X + otherBody.radius) - position.X;
-            double yDistance = (otherBody.position.Y + otherBody.radius) - position.Y;
+            double distance = Vector2.Distance(body.position, otherBody.position);
+            return distance;
+        }
 
-            double hypotenuse = (Math.Sqrt(Math.Pow(xDistance, 2) + Math.Pow(yDistance, 2)));
+        public static bool DetectCollision(List<Body> bodies)
+        {
+            // Kollar om det finns några planeter som är tillräckligt nära för att kollidera
+            foreach (Body body in bodies)
+            {
+                foreach (Body otherBody in bodies)
+                {
+                    if (body != otherBody)
+                    {
+                        double collisionDistance = 142984;
+                        double distance = Body.DetermineDistance(body, otherBody) * scaleMultiplier;
+                        if (distance < collisionDistance)
 
-            return hypotenuse;
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static void UpdateTimeSpeed(int speed)
+        {
+            double defaultValue = 0.25 * Math.Pow(10, 6);
+            if (speed == 0)
+            {
+                return;
+            }
+            else if (speed == 1)
+            {
+                Body.timeSpeed = defaultValue;
+            }
+            else
+            {
+                Body.timeSpeed = defaultValue * (3 * speed);
+            }
         }
     }
 }
