@@ -39,13 +39,13 @@ namespace ProjectRevolution
         Texture2D playBtn2Sprite;
         Texture2D playBtn3Sprite;
         Texture2D zoomBtnSprite;
-        
+
         Button zoomButton;
         Button pauseButton;
         Button playButton;
         Button playButton2;
         Button playButton3;
-        
+
         SpriteFont arial;
 
         List<Body> bodies = new List<Body>();
@@ -101,7 +101,7 @@ namespace ProjectRevolution
         {
             int displayWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             int displayHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            
+
             int windowWidth = 1320;
             int windowHeight = 695;
 
@@ -165,13 +165,13 @@ namespace ProjectRevolution
 
             zoomButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width - 70, 0), 70, 50, zoomBtnSprite, zoomBtnSprite);
 
-            playButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 3/4),
+            playButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 3 / 4),
                 graphics.PreferredBackBufferHeight - 50), 81, 50, 1, playBtnSprite);
 
-            playButton2 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 2/4),
+            playButton2 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 2 / 4),
                 graphics.PreferredBackBufferHeight - 50), 81, 50, 2, playBtn2Sprite);
 
-            playButton3 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 1/4),
+            playButton3 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 1 / 4),
                 graphics.PreferredBackBufferHeight - 50), 81, 50, 3, playBtn3Sprite);
 
             int[] randomDegrees = new int[2];
@@ -214,7 +214,7 @@ namespace ProjectRevolution
                 {
                     Planet planet = body as Planet;
                     planets.Add(planet);
-                    
+
                     // sorterar planeterna som inre eller yttre solsystem
                     if (Body.DetermineDistance(sun, planet) <= Body.DetermineDistance(sun, mars))
                     {
@@ -271,7 +271,7 @@ namespace ProjectRevolution
                     }
 
                     if (mouseHold == false)
-                    { 
+                    {
                         if (selectedBody != null)
                         {
                             foreach (TextBox textBox in menu.TxtBoxes)
@@ -357,6 +357,7 @@ namespace ProjectRevolution
                 graphics.GraphicsDevice.Clear(Color.Black);
                 spriteBatch.Begin();
 
+                // Sorterar bort kroppar som inte ska synas på nuvarande zoom-nivå.
                 List<Body> visibleBodies;
                 if (isZoomedOut)
                 {
@@ -423,7 +424,7 @@ namespace ProjectRevolution
                 {
                     wait++;
                 }
-                
+
                 menu.DrawStrings(spriteBatch, selectedBody);
 
                 if (physicsBroken && !promtedAboutCollision)
@@ -485,142 +486,12 @@ namespace ProjectRevolution
             return Keyboard.GetState().GetPressedKeys()[0];
         }
 
-        public int[] GenerateRngStartingAngles ()
+        public int[] GenerateRngStartingAngles()
         {
             Random rng = new Random();
             int degrees = rng.Next(0, 320);
             int[] values = new int[2] { degrees, degrees - 90 };
             return values;
         }
-
-        public void SpawnInnerSystem()
-        {
-            Random rng = new Random();
-            int rngNumb;
-            rngNumb = rng.Next(0, 360);
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.8, rngNumb, rngNumb - 90, 38.9, mercurySprite, tailSprite, planets[0], graphics);
-            bodies[1] = mercury;
-            rngNumb = rng.Next(0, 360);
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, planets[0], graphics);
-            bodies[2] = earth;
-            rngNumb = rng.Next(0, 360);
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, rngNumb - 90, 24.1, marsSprite, tailSprite, planets[0], graphics);
-            bodies[3] = mars;
-        }
-
-        public void SpawnOuterSystem()
-        {
-            Random rng = new Random();
-            int rngNumb;
-            rngNumb = rng.Next(0, 360);
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, rngNumb - 90, 13.1, jupiterSprite, tailSprite, planets[0], graphics);
-            bodies.Add(jupiter);
-            rngNumb = rng.Next(0, 360);
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1433.5, rngNumb, rngNumb - 90, 9.7, saturnusSprite, tailSprite, planets[0], graphics);
-            bodies.Add(saturn);
-            rngNumb = rng.Next(0, 360);
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 2872.5, rngNumb, rngNumb - 90, 6.8, uranusSprite, tailSprite, planets[0], graphics);
-            bodies.Add(uranus);
-            rngNumb = rng.Next(0, 360);
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4495.1, rngNumb, rngNumb - 90, 5.4, neptunusSprite, tailSprite, planets[0], graphics);
-            bodies.Add(neptune);
-        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Code graveyard
-
-// Om skärmen är 1366x768, spela i fullskärm, annars, centralisera rutan på skärmen
-//if (false)
-//{
-//    graphics.IsFullScreen = false;
-//    this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
-//}
-//else
-//{
-//    this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
-//}
-
-//if (keyboard.IsKeyDown(Keys.LeftShift))
-//{
-//    if (!pause)
-//    {
-//        if (shiftMouseHold)
-//        {
-//            dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
-//                initialPos.Y - mouse.Position.ToVector2().Y);
-//        }
-//        else
-//        {
-//            // Ser till att musen inte befinner sig utanför rutan när man droppar in planeter
-//            if (IsMouseInArea(mouse, new Point(0, 0), graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth - menuBackground.Width))
-//            {
-//                initialPos = mouse.Position.ToVector2();
-//                mouseHold = true;
-//                Console.WriteLine("Mouse: " + initialPos);
-//            }
-//        }
-//    }
-//}
-
-//else
-//{
-//    foreach (Body body in bodies)
-//    {
-//        if ((mouse.Position.X - body.Position.X < body.radius * 2 && mouse.Position.X - body.Position.X > 0)
-//            && (mouse.Position.Y - body.Position.Y < body.radius * 2 && mouse.Position.Y - body.Position.Y > 0))
-//        {
-//            selectedBody = body;
-//            isSelectedBody = true;
-//            menu.Body = body;
-//        }
-//    }
-//}
-
-
-
-
-
-
-//    if (shiftMouseHold == true)
-//    {
-//        shiftMouseHold = false;
-//        Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
-
-//        initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
-//        initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
-
-//        double mass = bodies[1].Mass; // Jordens massa
-//        string name = "Planet" + bodies.Count.ToString();
-
-//        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics);
-//        Console.WriteLine("Planet added at: " + spwnObject.Position);
-//        bodies.Add(spwnObject);
-//        planets.Add(spwnObject);
-//        spriteCache.Add(spwnObject, new List<Vector2>());
-//    }
