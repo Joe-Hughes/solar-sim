@@ -244,7 +244,7 @@ namespace ProjectRevolution
         {
             Body.UpdateTimeSpeed(simulationSpeed);
 
-            if (IrlTotalUpdateTimeSec(gameTime) >= (1 / preferedUPS))
+            if (IrlTotalUpdateTime(gameTime) >= (1 / preferedUPS))
             {
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
@@ -339,7 +339,7 @@ namespace ProjectRevolution
                         // Om det inte skett en kollision, uppdatera planeternas positioner igen.
                         if (!collisionDetected)
                         {
-                            planet.UpdateVelocityAndPosition(bodies, IrlTotalUpdateTimeSec(gameTime), IrlTotalUpdateTimeMilli(gameTime));
+                            planet.UpdateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
                             planet.Tail.AddTailPosition(planet);
                         }
                     }
@@ -392,7 +392,7 @@ namespace ProjectRevolution
                         }
                     }
 
-                    spriteBatch.Draw(body.Texture, body.Position);
+                    spriteBatch.Draw(body.Texture, body.SpritePosition);
                     
                     // Ritar markören om kroppen är markerad
                     if (body == selectedBody)
@@ -476,14 +476,9 @@ namespace ProjectRevolution
             return center;
         }
 
-        public double IrlTotalUpdateTimeSec(GameTime gametime)
+        public double IrlTotalUpdateTime(GameTime gametime)
         {
             return gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTimeSec;
-        }
-
-        public double IrlTotalUpdateTimeMilli(GameTime gametime)
-        {
-            return gametime.TotalGameTime.TotalMilliseconds - oldTotalUpdateTimeMilli;
         }
 
         public double IrlTotalDrawTime(GameTime gametime)

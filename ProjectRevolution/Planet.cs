@@ -40,6 +40,8 @@ namespace ProjectRevolution
         public bool IsOuterPlanet { get { return outerPlanet; } }
 
 
+
+
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
             double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDeviceManager graphicsDevice, bool outerPlanet)
             : base(mass, name, texture, graphicsDevice)
@@ -83,7 +85,7 @@ namespace ProjectRevolution
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
 
-        public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate, double oldTotalUpdateTimeMilli)
+        public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
         {
             Vector2 velocityVector = new Vector2();
 
@@ -124,8 +126,9 @@ namespace ProjectRevolution
             this.spritePosition = Vector2.Subtract(position, new Vector2(radius));
 
             speed = velocity.Length() * scaleMultiplier;
-            acceleration = (speed - oldSpeed) / (oldTotalUpdateTimeMilli / 1000 * timeSpeed);
+            acceleration = (speed - oldSpeed) / (totalSecondsSinceUpdate * timeSpeed);
             oldSpeed = speed;
+
         }
 
         // Konverterar en vinkel angiven i grader och returnerar en vektor motsvarande den platsen i enhetscirkeln.

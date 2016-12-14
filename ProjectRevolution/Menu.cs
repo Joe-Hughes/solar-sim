@@ -143,17 +143,11 @@ namespace ProjectRevolution
                 Planet planet = body as Planet;
 
                 txtBoxName.Text = planet.Name;
-                txtBoxDesName.Text = "Namn: ";
-                txtBoxDesDis.Text = "Distans till solen: ";
-                txtBoxDesVel.Text = "Hastighet: ";
-                txtBoxDesAcc.Text = "Acceleration: ";
-                txtBoxDesRealTime.Text = "Passerad verklig tid: ";
-                txtBoxDesSimTime.Text = "Passerad simulationstid: ";
 
                 txtBoxDis.Text = Math.Round((Body.DetermineDistance(planet, sun) * planet.ScaleMultiplier * 6.68469 * Math.Pow(10, -12)), 3).ToString() + " AU";
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString() + " m/s";
-                txtBoxAcc.Text = planet.Acceleration * 1000 + " mm/s^2";
-                txtBoxCentriAcc.Text = (Math.Pow(planet.Acceleration * 1000, 2) / Body.DetermineDistance(planet, sun)).ToString() + " mm/s^2";
+                txtBoxAcc.Text = Math.Round(planet.Acceleration, 10) * 1000 + " mm/s^2";
+                txtBoxCentriAcc.Text = Math.Round((Math.Pow(planet.Acceleration * 1000, 2) / Body.DetermineDistance(planet, sun)), 10) + " mm/s^2";
                 
             }
             else

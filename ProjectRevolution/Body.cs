@@ -55,7 +55,7 @@ namespace ProjectRevolution
 
             // Sätter stjärnan i mitten av skärmen genom att ta skärmstorleken och dela på två
             this.position = Game1.GetCenter(graphics);
-            this.spritePosition = Vector2.Subtract(Vector2.Multiply(position, new Vector2((float)scaleMultiplier)), new Vector2(radius));
+            this.spritePosition = Vector2.Subtract(position, new Vector2(radius));
         }
 
         // Statisk Overload-funktion för när man behöver veta distansen mellan en viss punkt och en kropp.
