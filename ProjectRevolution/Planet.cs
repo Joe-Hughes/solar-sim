@@ -16,6 +16,7 @@ namespace ProjectRevolution
         private double force; // Enhet: newton
         private double speed; // Hastighet i SI-enheter alltså meter/sekund
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
+        private bool outerPlanet;
 
         private Tail tail;
 
@@ -36,10 +37,11 @@ namespace ProjectRevolution
         }
         
         public Tail Tail { get { return tail; } }
+        public bool IsOuterPlanet { get { return outerPlanet; } }
 
 
         public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
-            double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDeviceManager graphicsDevice)
+            double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDeviceManager graphicsDevice, bool outerPlanet)
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
@@ -60,6 +62,8 @@ namespace ProjectRevolution
             // Skapar en vektor som har en riktning enligt velocityAngle och längd enligt initialVelocity
             Vector2 velocityVector = AngleToVector(velocityAngle);
             this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
+
+            this.outerPlanet = outerPlanet;
         }
 
         //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
