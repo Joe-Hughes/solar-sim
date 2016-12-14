@@ -17,12 +17,11 @@ namespace ProjectRevolution
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         TimeSpan realTimeElapsed;
-        // Specifierar hur lång tid som spelet varit pausat så att man kan subtrahera det från TimeElapsed.
-        TimeSpan totalPausedTime;
+        TimeSpan totalPausedTime; // Specifierar hur lång tid som spelet varit pausat så att man kan subtrahera det från TimeElapsed.
 
-        Texture2D planetSprite;
         Texture2D starSprite;
         Texture2D earthSprite;
+        Texture2D venusSprite;
         Texture2D marsSprite;
         Texture2D mercurySprite;
         Texture2D jupiterSprite;
@@ -50,18 +49,26 @@ namespace ProjectRevolution
 
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
+        // De kroppar som syns, innehåller antingen innerSystem eller outerSystem
+        List<Body> visibleBodies;
+        // Innehåller det inre solsystemet, solen t.om. Mars
         List<Body> innerSystem = new List<Body>();
+        // Innehåller det yttre solsystemet, 
         List<Body> outerSystem = new List<Body>();
+
 
         public static double referenceDistanceInUnits;
         public static double referenceDistanceInMeters;
 
         bool mouseHold = false;
 
+        // Antalet gånger som skärmen uppdateras per sekund
         double drawFrequency;
+        // Antalet gånger som planeternas positioner uppdateras per sekund
         double updateFrequency;
 
         bool isZoomedOut = false;
+        // Simulationshastigheten anges i 4 steg från 0-3. Ej linjär och beror även på zoom-nivå.
         int simulationSpeed = 1;
 
         Rectangle menuBackground;
@@ -70,6 +77,7 @@ namespace ProjectRevolution
 
         Body selectedBody = null;
 
+        // Håller koll på om kroppar kolliderat
         bool physicsBroken = false;
         bool promtedAboutCollision = false;
 
@@ -85,19 +93,13 @@ namespace ProjectRevolution
         double preferedUPS = 10 * 60;
         int wait = 0;
 
-
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+
         protected override void Initialize()
         {
             int displayWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
@@ -112,7 +114,8 @@ namespace ProjectRevolution
             graphics.PreferredBackBufferHeight = windowHeight;   // Spelrutans höjd i pixlar
             graphics.IsFullScreen = false;
 
-            this.Window.Position = new Point((displayWidth - windowWidth) / 2 - 20, (displayHeight - windowHeight) / 2 - 20);
+            // Centrerar rutan ordentligt
+            this.Window.Position = new Point((displayWidth - windowWidth) / 2 - 10, 0);
 
             graphics.PreferMultiSampling = true;    // Förminskar pixelering på icke-raka linjer
             graphics.ApplyChanges();
@@ -120,7 +123,8 @@ namespace ProjectRevolution
 
             // Använd en planet som referensvärden för att få fram meter per positionsenhet.
             // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
-            // Planet: 
+            // Detta används för att räkna i SI-enheter och sedan konvertera till pixlar
+            // Mars används i inzoomat läge och Neptunus i utzoomat läge.
             referenceDistanceInUnits = (graphics.PreferredBackBufferHeight / 2) - 10;
             referenceDistanceInMeters = 227.9 * Math.Pow(10, 9);
 
@@ -135,10 +139,9 @@ namespace ProjectRevolution
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Laddar alla sprites från /Content mappen
-
             starSprite = this.Content.Load<Texture2D>(@"STAR");
-            planetSprite = this.Content.Load<Texture2D>(@"earth");
             earthSprite = this.Content.Load<Texture2D>(@"earth");
+            venusSprite = this.Content.Load<Texture2D>(@"venus");
             marsSprite = this.Content.Load<Texture2D>(@"mars");
             mercurySprite = this.Content.Load<Texture2D>(@"mercury");
             jupiterSprite = this.Content.Load<Texture2D>(@"jupiter");
@@ -175,40 +178,51 @@ namespace ProjectRevolution
             playButton3 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 1 / 4),
                 graphics.PreferredBackBufferHeight - 50), 81, 50, 3, playBtn3Sprite);
 
+            // Används för att placera kropparna på slumpvisa riktningar runt solen
             int[] randomDegrees = new int[2];
             Random rng = new Random();
             int rngNumb;
 
-            // Skapar kroppar och lägger in dem i systemet
+            // Skapar kroppar och lägger in dem i systemet. Data från http://nssdc.gsfc.nasa.gov/planetary/factsheet/index.html
+            // Istället för medelvärdena för distans och hastighet används aphelium (sträcka längst från solen) och minimihastighet
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Solen", starSprite, graphics);
             bodies.Add(sun);
+
             rngNumb = rng.Next(0, 360);
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.82, rngNumb, rngNumb - 90, 38.86, mercurySprite, tailSprite, sun, graphics, false);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Merkurius", 69.82, rngNumb, 38.86, mercurySprite, tailSprite, graphics);
             bodies.Add(mercury);
+
             rngNumb = rng.Next(0, 360);
-            Planet venus = new Planet(4.8675 * Math.Pow(10, 24), "Venus", 108.94, rngNumb, rngNumb - 90, 34.79, planetSprite, tailSprite, sun, graphics, false);
+            Planet venus = new Planet(4.8675 * Math.Pow(10, 24), "Venus", 108.94, rngNumb, 34.79, venusSprite, tailSprite, graphics);
             bodies.Add(venus);
+
             rngNumb = rng.Next(0, 360);
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Jorden", 152.10, rngNumb, rngNumb - 90, 29.29, earthSprite, tailSprite, sun, graphics, false);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Jorden", 152.10, rngNumb, 29.29, earthSprite, tailSprite, graphics);
             bodies.Add(earth);
+
             rngNumb = rng.Next(0, 360);
-            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, rngNumb - 90, 24.1, marsSprite, tailSprite, sun, graphics, false);
+            Planet mars = new Planet(0.64171 * Math.Pow(10, 24), "Mars", 227.9, rngNumb, 24.1, marsSprite, tailSprite, graphics);
             bodies.Add(mars);
+
             rngNumb = rng.Next(0, 360);
-            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, rngNumb - 90, 13.1, jupiterSprite, tailSprite, sun, graphics, true);
+            Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, 13.1, jupiterSprite, tailSprite, graphics);
             bodies.Add(jupiter);
+
             rngNumb = rng.Next(0, 360);
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1514.50, rngNumb, rngNumb - 90, 9.09, saturnusSprite, tailSprite, sun, graphics, true);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturnus", 1514.50, rngNumb, 9.09, saturnusSprite, tailSprite, graphics);
             bodies.Add(saturn);
+
             rngNumb = rng.Next(0, 360);
-            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 3003.62, rngNumb, rngNumb - 90, 6.49, uranusSprite, tailSprite, sun, graphics, true);
+            Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 3003.62, rngNumb, 6.49, uranusSprite, tailSprite, graphics);
             bodies.Add(uranus);
+
             rngNumb = rng.Next(0, 360);
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4545.67, rngNumb, rngNumb - 90, 5.37, neptunusSprite, tailSprite, sun, graphics, true);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptunus", 4545.67, rngNumb, 5.37, neptunusSprite, tailSprite, graphics);
             bodies.Add(neptune);
 
             menu = new Menu(sun, graphics, arial, realTimeElapsed);
 
+            // Fyller listerna 'bodies', 'innerSystem' och 'outerSystem' med tillhörande kroppar.
             foreach (Body body in bodies)
             {
                 if (!body.IsStar)
@@ -231,10 +245,6 @@ namespace ProjectRevolution
             }
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
         protected override void UnloadContent()
         {
             Content.Unload();
@@ -242,23 +252,29 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
-            Body.UpdateTimeSpeed(simulationSpeed);
-
+            // Kör endast Update-metoden om det gått tillräckligt lång tid (angiven i preferedUPS) sedan senaste uppdateringen.
             if (IrlTotalUpdateTime(gameTime) >= (1 / preferedUPS))
             {
+                // Uppdaterar TimeSpeed beroende på zoom-nivån
+                Body.UpdateTimeSpeed(simulationSpeed, isZoomedOut);
+
+                // Stänger ned programmet om man trycker på ESC
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
 
                 KeyboardState keyboard = Keyboard.GetState();
                 MouseState mouse = Mouse.GetState();
 
+                // Noterar användarens tangentbortstryckningar om ett textfält är i fokus
                 if (takeKeyboardInput)
                 {
                     kbHandler.Update(menu);
                 }
+
+                // Om vänster musknapp är nedtryckt kollar programmet vad användaren försöker trycka på och agerar sedan på det.
                 if (mouse.LeftButton == ButtonState.Pressed)
                 {
-                    // Kollar om man tryckt på pausknappen och sparar sedan resultatet i "paus"-variabeln
+                    // Kollar om man tryckt på zoom-knappen
                     isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits, planets, graphics);
 
                     // Kollar om man tryckt på någon av tidsknapparna och byter i så fall hastighet
@@ -266,11 +282,8 @@ namespace ProjectRevolution
                     simulationSpeed = playButton.CheckClick(mouse, mouseHold, simulationSpeed, menu);
                     simulationSpeed = playButton2.CheckClick(mouse, mouseHold, simulationSpeed, menu);
                     simulationSpeed = playButton3.CheckClick(mouse, mouseHold, simulationSpeed, menu);
-                    if (simulationSpeed > 0 && physicsBroken && !promtedAboutCollision)
-                    {
-                        promtedAboutCollision = true;
-                    }
 
+                    // Kollar om användaren tryckt på ett redigerbart fält och förbereder sedan för inmatning
                     if (mouseHold == false)
                     {
                         if (selectedBody != null)
@@ -290,6 +303,8 @@ namespace ProjectRevolution
                             }
                         }
                     }
+
+                    // Markerar kroppar som användaren trycker på
                     foreach (Body body in bodies)
                     {
                         if (IsMouseInArea(mouse, body.SpritePosition.ToPoint(), body.radius * 2, body.radius * 2))
@@ -309,26 +324,41 @@ namespace ProjectRevolution
                     }
                     mouseHold = true;
                 }
-
                 else if (mouse.LeftButton == ButtonState.Released)
                 {
                     mouseHold = false;
                 }
 
+                // Förbereder Draw-metoden för att varna användaren om att det skett en kollision
+                if (simulationSpeed > 0 && physicsBroken && !promtedAboutCollision)
+                {
+                    promtedAboutCollision = true;
+                }
+
                 // Om spelet inte är pausat, uppdatera planeternas positioner och värden
                 if (simulationSpeed > 0)
                 {
-                    // Uppdaterar variabeln som håller koll på hur länge simulationen pågått (minus total paus tid)
+                    // Uppdaterar variabeln som håller koll på hur länge simulationen pågått (minus total pausad tid)
                     realTimeElapsed = gameTime.TotalGameTime.Subtract(totalPausedTime);
 
+                    // Sorterar bort kroppar som inte ska synas på nuvarande zoom-nivå.
+                    if (isZoomedOut)
+                    {
+                        visibleBodies = outerSystem;
+                    }
+                    else
+                    {
+                        visibleBodies = innerSystem;
+                    }
+
+                    // Kollar om någon av de synliga kropparna kolliderat med varandra.
+                    // Promptar sedan användaren när det händer första gången och frågar om den vill fortsätta.
                     foreach (Planet planet in planets)
                     {
-                        // Kollar om någon av kropparna kolliderat med varandra.
-                        // Promptar sedan användaren när det händer första gången och frågar om den vill fortsätta.
                         bool collisionDetected = false;
                         if (!physicsBroken)
                         {
-                            if (Body.DetectCollision(bodies))
+                            if (Body.DetectCollision(visibleBodies))
                             {
                                 collisionDetected = true;
                                 physicsBroken = true;
@@ -356,35 +386,23 @@ namespace ProjectRevolution
             }
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        //MakeDaPictures
         protected override void Draw(GameTime gameTime)
         {
+            // Kör endast Draw-metoden om det gått tillräckligt lång tid (angiven i preferedFPS) sedan senaste uppdateringen.
             if (IrlTotalDrawTime(gameTime) >= (1 / preferedFPS))
             {
-                //MakeDaPictures
+                // Ritar den svarta backgrunden och tar bort föregående bild
                 graphics.GraphicsDevice.Clear(Color.Black);
-                spriteBatch.Begin();
 
-                // Sorterar bort kroppar som inte ska synas på nuvarande zoom-nivå.
-                List<Body> visibleBodies;
-                if (isZoomedOut)
-                {
-                    visibleBodies = outerSystem;
-                }
-                else
-                {
-                    visibleBodies = innerSystem;
-                }
+                spriteBatch.Begin();
 
                 foreach (Body body in visibleBodies)
                 {
-                    // Ritar ut tails för alla planeter
+                    // Ritar ut historiska banor för alla planeter
                     if (!body.IsStar)
                     {
-                        Planet planet = body as Planet;  
+                        Planet planet = body as Planet;
                         Tail tail = planet.Tail;
                         foreach (Vector2 position in tail.GetTailPositions())
                         {
@@ -392,6 +410,7 @@ namespace ProjectRevolution
                         }
                     }
 
+                    // Ritar själva kroppen
                     spriteBatch.Draw(body.Texture, body.SpritePosition);
                     
                     // Ritar markören om kroppen är markerad
@@ -405,12 +424,11 @@ namespace ProjectRevolution
                 // Ritar menyns bakgrundsfärg
                 spriteBatch.Draw(menuSprite, null, menuBackground);
 
-                // Ritar tidsknapparna
+                // Ritar zoom- och tidsknapparna
                 spriteBatch.Draw(pauseButton.Texture, pauseButton.Location.ToVector2());
                 spriteBatch.Draw(playButton.Texture, playButton.Location.ToVector2());
                 spriteBatch.Draw(playButton2.Texture, playButton2.Location.ToVector2());
                 spriteBatch.Draw(playButton3.Texture, playButton3.Location.ToVector2());
-
                 spriteBatch.Draw(zoomButton.Texture, zoomButton.Location.ToVector2());
 
                 // Ritar debugmätarna för FPS och UPS
@@ -418,7 +436,8 @@ namespace ProjectRevolution
                 //if (IrlTotalUpdateTimeSec(gameTime) != 0)    //Temporary
                 //    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / IrlTotalUpdateTimeSec(gameTime)), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
 
-                //If it's selected the planets info gets drawn ontop of the menu's background sprite
+                // Fyller menyn med information om planeten.
+                // endast var 5:e bilduppdatering
                 if (wait >= 5)
                 {
                     wait = 0;
@@ -435,9 +454,10 @@ namespace ProjectRevolution
                 {
                     wait++;
                 }
-
                 menu.DrawStrings(spriteBatch, selectedBody);
 
+                // Ritar en ruta som informerar användaren om att 2 kroppar kolliderat
+                // (händer endast första gången något kolliderar)
                 if (physicsBroken && !promtedAboutCollision)
                 {
                     int width = 275;
@@ -467,6 +487,7 @@ namespace ProjectRevolution
             }
         }
 
+        // Returnerar positionen för solsystemets centrum (solens position)
         public static Vector2 GetCenter(GraphicsDeviceManager graphicsDevice)
         {
             Point window = graphicsDevice.GraphicsDevice.PresentationParameters.Bounds.Center;
@@ -486,6 +507,7 @@ namespace ProjectRevolution
             return gametime.TotalGameTime.TotalSeconds - oldTotalDrawTime;
         }
 
+        // Returnerar True om musen är inom ett angivet område
         public static bool IsMouseInArea(MouseState mousestate, Point position, double Height, double Width)
         {
             return mousestate.X > position.X && mousestate.X < position.X + Width

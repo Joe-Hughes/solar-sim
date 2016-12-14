@@ -21,13 +21,16 @@ namespace ProjectRevolution
         // Stjärnor behöver inte en egen klass och definieras därför endast genom denna bool.
         // Om man däremot skapar en planet falsifieras denna variabel i konstrukorn.
         protected bool isStar = true;
-        
 
-        // Använd en planet som referenspunkt för att få fram meter per positionsenhet.
+
+        // Använd en planet som referensvärden för att få fram meter per positionsenhet.
         // Alltså (planetens avstånd från solen i enheter)/(planetens avstånd från stolen i meter)
-        // Planet: Nepunus
+        // Detta används för att räkna i SI-enheter och sedan konvertera till pixlar
+        // Mars används i inzoomat läge och Neptunus i utzoomat läge.
         public static double scaleMultiplier = Game1.referenceDistanceInMeters / Game1.referenceDistanceInUnits;
 
+        // Ett mått på hur snabbt simulationstiden går i relation till verkligheten.
+        // Antar värden mellan 0.25 * 10^6 och 4.5 * 10^6
         public static double timeSpeed;
 
         // Newtons konstant, gäller för alla kroppar med massa
@@ -66,19 +69,21 @@ namespace ProjectRevolution
             return distance;
         }
 
+        // Kollar om det finns några planeter som är tillräckligt nära för att kollidera
         public static bool DetectCollision(List<Body> bodies)
         {
-            // Kollar om det finns några planeter som är tillräckligt nära för att kollidera
             foreach (Body body in bodies)
             {
                 foreach (Body otherBody in bodies)
                 {
                     if (body != otherBody)
                     {
-                        double collisionDistance = 142984;
+                        // Kriteriet för att det ska räknas som en kollision är att
+                        // en av kropparnas radie inkräktar på den andres position
+                        double bodyRadius = body.radius * scaleMultiplier;
+                        double otherBodyRadius = otherBody.radius * scaleMultiplier;
                         double distance = Body.DetermineDistance(body, otherBody) * scaleMultiplier;
-                        if (distance < collisionDistance)
-
+                        if (distance < bodyRadius || distance < otherBodyRadius)
                         {
                             return true;
                         }
@@ -88,9 +93,19 @@ namespace ProjectRevolution
             return false;
         }
 
-        public static void UpdateTimeSpeed(int speed)
+        // Uppdaterar timeSpeed beroende på zoom och vald simulationshastighet.
+        public static void UpdateTimeSpeed(int speed, bool isZoomedOut)
         {
             double defaultValue = 0.25 * Math.Pow(10, 6);
+            if (isZoomedOut)
+            {
+                defaultValue = 0.5 * Math.Pow(10, 6);
+            }
+            else
+            {
+                defaultValue = 0.25 * Math.Pow(10, 6);
+            }
+
             if (speed == 0)
             {
                 return;

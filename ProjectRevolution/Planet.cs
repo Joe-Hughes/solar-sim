@@ -16,7 +16,6 @@ namespace ProjectRevolution
         private double force; // Enhet: newton
         private double speed; // Hastighet i SI-enheter alltså meter/sekund
         private double oldSpeed = 0; // Används för att beräkna delta-hastighet
-        private bool outerPlanet;
 
         private Tail tail;
 
@@ -37,17 +36,12 @@ namespace ProjectRevolution
         }
         
         public Tail Tail { get { return tail; } }
-        public bool IsOuterPlanet { get { return outerPlanet; } }
-
-
-
-
-        public Planet(double mass, string name, double distanceFromStar, double positionAngle, double velocityAngle, 
-            double initialVelocity, Texture2D texture, Texture2D tailTexture, Body star, GraphicsDeviceManager graphicsDevice, bool outerPlanet)
+        public Planet(double mass, string name, double distanceFromStar, double positionAngle, 
+            double initialVelocity, Texture2D texture, Texture2D tailTexture, GraphicsDeviceManager graphicsDevice)
             : base(mass, name, texture, graphicsDevice)
         {
             this.isStar = false;
-            tail = new Tail(this.name, texture.Width/2, tailTexture, 140, graphicsDevice); // Tar bort tails efter x grader
+            tail = new Tail(this.name, texture.Width/2, tailTexture, 140, graphicsDevice); // Tar bort tails efter 140 grader
 
             // Tar en given vinkel och avstånd från stjärnan och placerar planeten på den platsen.
             Vector2 angleVector = AngleToVector(positionAngle);
@@ -55,50 +49,27 @@ namespace ProjectRevolution
             double distance = distanceFromStar * Math.Pow(10, 9) / scaleMultiplier;
             angleVector = Vector2.Multiply(angleVector, Convert.ToSingle(distance));
 
-            double posX = Game1.GetCenter(graphicsDevice).X + angleVector.X;
-            double posY = Game1.GetCenter(graphicsDevice).Y + angleVector.Y;
-
-            Vector2 initPosition = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
+            // Positionerar planeten med hänsyn till solsystemets mittpunkt
+            Vector2 initPosition = Vector2.Add(Game1.GetCenter(graphicsDevice), angleVector);
             this.position = initPosition;
 
             // Skapar en vektor som har en riktning enligt velocityAngle och längd enligt initialVelocity
-            Vector2 velocityVector = AngleToVector(velocityAngle);
+            Vector2 velocityVector = AngleToVector(positionAngle - 90);
             this.velocity = Vector2.Multiply(velocityVector, Convert.ToSingle((initialVelocity * 1000) / scaleMultiplier));
-
-            this.outerPlanet = outerPlanet;
         }
-
-        //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
-        //public Planet(double mass, string name, Vector2 position, Vector2 velocity,
-        //    Texture2D texture, Body star, GraphicsDeviceManager graphics)
-        //    : base(mass, name, texture, graphics)
-        //{
-        //    this.isStar = false;
-
-        //    this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
-
-        //    double posX = Game1.GetCenter(graphics).X + position.X;
-        //    double posY = Game1.GetCenter(graphics).Y + position.Y;
-
-        //    this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
-        //}
-
-        // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
 
         public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
         {
+            // Beräknar kraften som verkar från varje kropp.
+            // Utifrån detta kan en hastighetsvektor beräknas med avseende på massan och tiden sedan den senaste uppdateringen
+            // Dessa vektorer adderas sedan ihop för att beräkna vart planeten bör positioneras denna updatering
             Vector2 velocityVector = new Vector2();
-
             foreach (Body otherBody in bodies)
             {
                 if (otherBody != this)
                 {
-
-                    // radien behöver adderas på båda distanserna då positionen tas från det över vänstra hörnet av kroppen.
-                    double xDistance = otherBody.Position.X - this.position.X;
-                    double yDistance = otherBody.Position.Y - this.position.Y;
-
-                    Vector2 direction = new Vector2(Convert.ToSingle(xDistance), Convert.ToSingle(yDistance));
+                    Vector2 direction = Vector2.Subtract(otherBody.Position, this.position);
+                    // Normaliserar riktningen till ett trigonometriskt värde i enhetscirkeln
                     direction.Normalize();
 
                     // gravitationslagen F = G * (m*M / r^2)
@@ -121,8 +92,7 @@ namespace ProjectRevolution
             // När alla enskilda vektorer adderats ihop uppdateras velocity och positionen och beräknas utifrån den
             this.velocity += velocityVector;
 
-            this.position.X += velocity.X * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
-            this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
+            this.position = Vector2.Add(this.position, Vector2.Multiply(velocity, Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed)));
             this.spritePosition = Vector2.Subtract(position, new Vector2(radius));
 
             speed = velocity.Length() * scaleMultiplier;

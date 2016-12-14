@@ -22,6 +22,7 @@ namespace ProjectRevolution
         private TextBox txtBoxRealTime;
         private TextBox txtBoxSimTime;
 
+        // 'text box description", texten som är före den riktiga textboxen
         private TextBox txtBoxDesName;
         private TextBox txtBoxDesDis;
         private TextBox txtBoxDesVel;

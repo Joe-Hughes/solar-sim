@@ -24,21 +24,21 @@ namespace ProjectRevolution
             KeyboardState kbState = Keyboard.GetState();
             Keys[] pressedKeys = kbState.GetPressedKeys();
 
-            //check if any of the previous update's keys are no longer pressed
+            // Kollar om några av knapparna från senaste uppdateringen fortfarande är nedtrycka
             foreach (Keys key in lastPressedKeys)
             {
                 if (!pressedKeys.Contains(key))
                     OnKeyUp(key);
             }
 
-            //check if the currently pressed keys were already pressed
+            // Kollar om de tidigare tryckta knapparna fortfarande är trycka
             foreach (Keys key in pressedKeys)
             {
                 if (!lastPressedKeys.Contains(key))
                     OnKeyDown(key, menu);
             }
 
-            //save the currently pressed keys so we can compare on the next update
+            // Sparar de för nuvarande nedtrycka knapparna 
             lastPressedKeys = pressedKeys;
         }
 
