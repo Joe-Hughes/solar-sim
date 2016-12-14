@@ -23,6 +23,7 @@ namespace ProjectRevolution
         Texture2D planetSprite;
         Texture2D starSprite;
         Texture2D earthSprite;
+        Texture2D venusSprite;
         Texture2D marsSprite;
         Texture2D mercurySprite;
         Texture2D jupiterSprite;
@@ -111,7 +112,7 @@ namespace ProjectRevolution
             graphics.PreferredBackBufferHeight = windowHeight;   // Spelrutans höjd i pixlar
             graphics.IsFullScreen = false;
 
-            this.Window.Position = new Point((displayWidth - windowWidth) / 2 - 20, (displayHeight - windowHeight) / 2 - 20);
+            this.Window.Position = new Point((displayWidth - windowWidth) / 2 - 10, 0);
 
             graphics.PreferMultiSampling = true;    // Förminskar pixelering på icke-raka linjer
             graphics.ApplyChanges();
@@ -138,6 +139,7 @@ namespace ProjectRevolution
             starSprite = this.Content.Load<Texture2D>(@"STAR");
             planetSprite = this.Content.Load<Texture2D>(@"earth");
             earthSprite = this.Content.Load<Texture2D>(@"earth");
+            venusSprite = this.Content.Load<Texture2D>(@"venus");
             marsSprite = this.Content.Load<Texture2D>(@"mars");
             mercurySprite = this.Content.Load<Texture2D>(@"mercury");
             jupiterSprite = this.Content.Load<Texture2D>(@"jupiter");
@@ -182,10 +184,10 @@ namespace ProjectRevolution
             Body sun = new Body(1.9885 * Math.Pow(10, 30), "Solen", starSprite, graphics);
             bodies.Add(sun);
             rngNumb = rng.Next(0, 360);
-            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.82, rngNumb, rngNumb - 90, 38.86, mercurySprite, tailSprite, sun, graphics, false);
+            Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Merkurius", 69.82, rngNumb, rngNumb - 90, 38.86, mercurySprite, tailSprite, sun, graphics, false);
             bodies.Add(mercury);
             rngNumb = rng.Next(0, 360);
-            Planet venus = new Planet(4.8675 * Math.Pow(10, 24), "Venus", 108.94, rngNumb, rngNumb - 90, 34.79, planetSprite, tailSprite, sun, graphics, false);
+            Planet venus = new Planet(4.8675 * Math.Pow(10, 24), "Venus", 108.94, rngNumb, rngNumb - 90, 34.79, venusSprite, tailSprite, sun, graphics, false);
             bodies.Add(venus);
             rngNumb = rng.Next(0, 360);
             Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Jorden", 152.10, rngNumb, rngNumb - 90, 29.29, earthSprite, tailSprite, sun, graphics, false);
@@ -197,13 +199,13 @@ namespace ProjectRevolution
             Planet jupiter = new Planet(1898 * Math.Pow(10, 24), "Jupiter", 778.6, rngNumb, rngNumb - 90, 13.1, jupiterSprite, tailSprite, sun, graphics, true);
             bodies.Add(jupiter);
             rngNumb = rng.Next(0, 360);
-            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturn", 1514.50, rngNumb, rngNumb - 90, 9.09, saturnusSprite, tailSprite, sun, graphics, true);
+            Planet saturn = new Planet(568 * Math.Pow(10, 24), "Saturnus", 1514.50, rngNumb, rngNumb - 90, 9.09, saturnusSprite, tailSprite, sun, graphics, true);
             bodies.Add(saturn);
             rngNumb = rng.Next(0, 360);
             Planet uranus = new Planet(86.8 * Math.Pow(10, 24), "Uranus", 3003.62, rngNumb, rngNumb - 90, 6.49, uranusSprite, tailSprite, sun, graphics, true);
             bodies.Add(uranus);
             rngNumb = rng.Next(0, 360);
-            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptune", 4545.67, rngNumb, rngNumb - 90, 5.37, neptunusSprite, tailSprite, sun, graphics, true);
+            Planet neptune = new Planet(102 * Math.Pow(10, 24), "Neptunus", 4545.67, rngNumb, rngNumb - 90, 5.37, neptunusSprite, tailSprite, sun, graphics, true);
             bodies.Add(neptune);
 
             menu = new Menu(sun, graphics, arial, realTimeElapsed);
@@ -241,7 +243,7 @@ namespace ProjectRevolution
 
         protected override void Update(GameTime gameTime)
         {
-            Body.UpdateTimeSpeed(simulationSpeed);
+            Body.UpdateTimeSpeed(simulationSpeed, isZoomedOut);
 
             if (IrlTotalUpdateTime(gameTime) >= (1 / preferedUPS))
             {
@@ -255,9 +257,45 @@ namespace ProjectRevolution
                 {
                     kbHandler.Update(menu);
                 }
+
+                // Om spelet inte är pausat, uppdatera planeternas positioner och värden
+                if (simulationSpeed > 0)
+                {
+                    // Uppdaterar variabeln som håller koll på hur länge simulationen pågått (minus total paus tid)
+                    realTimeElapsed = gameTime.TotalGameTime.Subtract(totalPausedTime);
+
+                    foreach (Planet planet in planets)
+                    {
+                        // Kollar om någon av kropparna kolliderat med varandra.
+                        // Promptar sedan användaren när det händer första gången och frågar om den vill fortsätta.
+                        bool collisionDetected = false;
+                        if (!physicsBroken)
+                        {
+                            if (Body.DetectCollision(bodies))
+                            {
+                                collisionDetected = true;
+                                physicsBroken = true;
+                                simulationSpeed = 0;
+                            }
+                        }
+
+                        // Om det inte skett en kollision, uppdatera planeternas positioner igen.
+                        if (!collisionDetected)
+                        {
+                            planet.UpdateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                            planet.Tail.AddTailPosition(planet);
+                        }
+                    }
+                }
+                else
+                {
+                    // om programmet är pausat håller denna variabel koll på hur länge.
+                    totalPausedTime = gameTime.TotalGameTime.Subtract(realTimeElapsed);
+                }
+
                 if (mouse.LeftButton == ButtonState.Pressed)
                 {
-                    // Kollar om man tryckt på pausknappen och sparar sedan resultatet i "paus"-variabeln
+                    // Kollar om man tryckt på zoom-knappen
                     isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits, planets, graphics);
 
                     // Kollar om man tryckt på någon av tidsknapparna och byter i så fall hastighet
@@ -299,47 +337,10 @@ namespace ProjectRevolution
                     }
                     mouseHold = true;
                 }
-
                 else if (mouse.LeftButton == ButtonState.Released)
                 {
                     mouseHold = false;
                 }
-
-                // Om spelet inte är pausat, uppdatera planeternas positioner och värden
-                if (simulationSpeed > 0)
-                {
-                    // Uppdaterar variabeln som håller koll på hur länge simulationen pågått (minus total paus tid)
-                    realTimeElapsed = gameTime.TotalGameTime.Subtract(totalPausedTime);
-
-                    foreach (Planet planet in planets)
-                    {
-                        // Kollar om någon av kropparna kolliderat med varandra.
-                        // Promptar sedan användaren när det händer första gången och frågar om den vill fortsätta.
-                        bool collisionDetected = false;
-                        if (!physicsBroken)
-                        {
-                            if (Body.DetectCollision(bodies))
-                            {
-                                collisionDetected = true;
-                                physicsBroken = true;
-                                simulationSpeed = 0;
-                            }
-                        }
-
-                        // Om det inte skett en kollision, uppdatera planeternas positioner igen.
-                        if (!collisionDetected)
-                        {
-                            planet.UpdateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
-                            planet.Tail.AddTailPosition(planet);
-                        }
-                    }
-                }
-                else
-                {
-                    // om programmet är pausat håller denna variabel koll på hur länge.
-                    totalPausedTime = gameTime.TotalGameTime.Subtract(realTimeElapsed);
-                }
-
                 base.Update(gameTime);
                 oldTotalUpdateTime = gameTime.TotalGameTime.TotalSeconds;
             }

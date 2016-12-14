@@ -75,10 +75,10 @@ namespace ProjectRevolution
                 {
                     if (body != otherBody)
                     {
-                        double collisionDistance = 142984;
+                        double bodyRadius = body.radius * scaleMultiplier;
+                        double otherBodyRadius = otherBody.radius * scaleMultiplier;
                         double distance = Body.DetermineDistance(body, otherBody) * scaleMultiplier;
-                        if (distance < collisionDistance)
-
+                        if (distance < bodyRadius || distance < otherBodyRadius)
                         {
                             return true;
                         }
@@ -88,9 +88,18 @@ namespace ProjectRevolution
             return false;
         }
 
-        public static void UpdateTimeSpeed(int speed)
+        public static void UpdateTimeSpeed(int speed, bool isZoomedOut)
         {
             double defaultValue = 0.25 * Math.Pow(10, 6);
+            if (isZoomedOut)
+            {
+                defaultValue = 0.5 * Math.Pow(10, 6);
+            }
+            else
+            {
+                defaultValue = 0.25 * Math.Pow(10, 6);
+            }
+
             if (speed == 0)
             {
                 return;

@@ -66,23 +66,6 @@ namespace ProjectRevolution
             this.outerPlanet = outerPlanet;
         }
 
-        //Overload-funktion för att skapa en planet med given velocity och position istället för att beräkna med vinklar och distans från solen
-        //public Planet(double mass, string name, Vector2 position, Vector2 velocity,
-        //    Texture2D texture, Body star, GraphicsDeviceManager graphics)
-        //    : base(mass, name, texture, graphics)
-        //{
-        //    this.isStar = false;
-
-        //    this.velocity = Vector2.Divide(velocity, (float)scaleMultiplier);
-
-        //    double posX = Game1.GetCenter(graphics).X + position.X;
-        //    double posY = Game1.GetCenter(graphics).Y + position.Y;
-
-        //    this.position = new Vector2(Convert.ToSingle(posX), Convert.ToSingle(posY));
-        //}
-
-        // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
-
         public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
         {
             Vector2 velocityVector = new Vector2();
