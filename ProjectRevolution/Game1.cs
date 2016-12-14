@@ -39,19 +39,24 @@ namespace ProjectRevolution
         Texture2D playBtn2Sprite;
         Texture2D playBtn3Sprite;
         Texture2D zoomBtnSprite;
-        
+
         Button zoomButton;
         Button pauseButton;
         Button playButton;
         Button playButton2;
         Button playButton3;
-        
+
         SpriteFont arial;
 
         List<Body> bodies = new List<Body>();
         List<Planet> planets = new List<Planet>();
+<<<<<<< HEAD
         List<Planet> innerPlanets = new List<Planet>();
         List<Planet> outerPlanets = new List<Planet>();
+=======
+        List<Body> innerSystem = new List<Body>();
+        List<Body> outerSystem = new List<Body>();
+>>>>>>> b4ee6d63d4a4af3a23372a177d7a380a3b7181ab
 
         public static double referenceDistanceInUnits;
         public static double referenceDistanceInMeters;
@@ -101,7 +106,7 @@ namespace ProjectRevolution
         {
             int displayWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             int displayHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            
+
             int windowWidth = 1320;
             int windowHeight = 695;
 
@@ -165,13 +170,13 @@ namespace ProjectRevolution
 
             zoomButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - menuBackground.Width - 70, 0), 70, 50, zoomBtnSprite, zoomBtnSprite);
 
-            playButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 3/4),
+            playButton = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 3 / 4),
                 graphics.PreferredBackBufferHeight - 50), 81, 50, 1, playBtnSprite);
 
-            playButton2 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 2/4),
+            playButton2 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 2 / 4),
                 graphics.PreferredBackBufferHeight - 50), 81, 50, 2, playBtn2Sprite);
 
-            playButton3 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 1/4),
+            playButton3 = new Button(new Vector2(graphics.PreferredBackBufferWidth - (menuBackground.Width * 1 / 4),
                 graphics.PreferredBackBufferHeight - 50), 81, 50, 3, playBtn3Sprite);
 
             int[] randomDegrees = new int[2];
@@ -179,14 +184,18 @@ namespace ProjectRevolution
             int rngNumb;
 
             // Skapar kroppar och lägger in dem i systemet
-            Body sun = new Body(1.9885 * Math.Pow(10, 30), "Sun", starSprite, graphics);
+            Body sun = new Body(1.9885 * Math.Pow(10, 30), "Solen", starSprite, graphics);
             bodies.Add(sun);
             rngNumb = rng.Next(0, 360);
             Planet mercury = new Planet(0.330 * Math.Pow(10, 24), "Mercury", 69.82, rngNumb, rngNumb - 90, 38.86, mercurySprite, tailSprite, sun, graphics, false);
             bodies.Add(mercury);
             innerPlanets.Add(mercury);
             rngNumb = rng.Next(0, 360);
-            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Earth", 149.6, rngNumb, rngNumb - 90, 29.8, earthSprite, tailSprite, sun, graphics, false);
+            Planet venus = new Planet(4.8675 * Math.Pow(10, 24), "Venus", 108.94, rngNumb, rngNumb - 90, 34.79, planetSprite, tailSprite, sun, graphics, false);
+            bodies.Add(venus);
+			innerPlanets.Add(venus);
+            rngNumb = rng.Next(0, 360);
+            Planet earth = new Planet(5.9724 * Math.Pow(10, 24), "Jorden", 152.10, rngNumb, rngNumb - 90, 29.29, earthSprite, tailSprite, sun, graphics, false);
             bodies.Add(earth);
             innerPlanets.Add(earth);
             rngNumb = rng.Next(0, 360);
@@ -218,7 +227,19 @@ namespace ProjectRevolution
                 {
                     Planet planet = body as Planet;
                     planets.Add(planet);
+
+                    // sorterar planeterna som inre eller yttre solsystem
+                    if (Body.DetermineDistance(sun, planet) <= Body.DetermineDistance(sun, mars))
+                    {
+                        innerSystem.Add(planet);
+                    }
+                    else
+                    {
+                        outerSystem.Add(planet);
+                    }
                 }
+                innerSystem.Add(sun);
+                outerSystem.Add(sun);
             }
         }
 
@@ -263,7 +284,7 @@ namespace ProjectRevolution
                     }
 
                     if (mouseHold == false)
-                    { 
+                    {
                         if (selectedBody != null)
                         {
                             foreach (TextBox textBox in menu.TxtBoxes)
@@ -348,7 +369,19 @@ namespace ProjectRevolution
                 //MakeDaPictures
                 graphics.GraphicsDevice.Clear(Color.Black);
                 spriteBatch.Begin();
-                foreach (Body body in bodies)
+
+                // Sorterar bort kroppar som inte ska synas på nuvarande zoom-nivå.
+                List<Body> visibleBodies;
+                if (isZoomedOut)
+                {
+                    visibleBodies = outerSystem;
+                }
+                else
+                {
+                    visibleBodies = innerSystem;
+                }
+
+                foreach (Body body in visibleBodies)
                 {
                     // Ritar ut tails för alla planeter
                     if (!body.IsStar)
@@ -410,7 +443,7 @@ namespace ProjectRevolution
                 {
                     wait++;
                 }
-                
+
                 menu.DrawStrings(spriteBatch, selectedBody);
 
                 if (physicsBroken && !promtedAboutCollision)
@@ -472,7 +505,7 @@ namespace ProjectRevolution
             return Keyboard.GetState().GetPressedKeys()[0];
         }
 
-        public int[] GenerateRngStartingAngles ()
+        public int[] GenerateRngStartingAngles()
         {
             Random rng = new Random();
             int degrees = rng.Next(0, 320);
@@ -481,100 +514,3 @@ namespace ProjectRevolution
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Code graveyard
-
-// Om skärmen är 1366x768, spela i fullskärm, annars, centralisera rutan på skärmen
-//if (false)
-//{
-//    graphics.IsFullScreen = false;
-//    this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
-//}
-//else
-//{
-//    this.Window.Position = new Point((displayWidth - windowWidth) / 2, (displayHeight - windowHeight) / 2);
-//}
-
-//if (keyboard.IsKeyDown(Keys.LeftShift))
-//{
-//    if (!pause)
-//    {
-//        if (shiftMouseHold)
-//        {
-//            dragVector = new Vector2(initialPos.X - mouse.Position.ToVector2().X,
-//                initialPos.Y - mouse.Position.ToVector2().Y);
-//        }
-//        else
-//        {
-//            // Ser till att musen inte befinner sig utanför rutan när man droppar in planeter
-//            if (IsMouseInArea(mouse, new Point(0, 0), graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth - menuBackground.Width))
-//            {
-//                initialPos = mouse.Position.ToVector2();
-//                mouseHold = true;
-//                Console.WriteLine("Mouse: " + initialPos);
-//            }
-//        }
-//    }
-//}
-
-//else
-//{
-//    foreach (Body body in bodies)
-//    {
-//        if ((mouse.Position.X - body.Position.X < body.radius * 2 && mouse.Position.X - body.Position.X > 0)
-//            && (mouse.Position.Y - body.Position.Y < body.radius * 2 && mouse.Position.Y - body.Position.Y > 0))
-//        {
-//            selectedBody = body;
-//            isSelectedBody = true;
-//            menu.Body = body;
-//        }
-//    }
-//}
-
-
-
-
-
-
-//    if (shiftMouseHold == true)
-//    {
-//        shiftMouseHold = false;
-//        Vector2 shootVector = new Vector2(dragVector.X * 100, dragVector.Y * 100);
-
-//        initialPos.X = initialPos.X - Body.GetCenter(graphics.GraphicsDevice).X;
-//        initialPos.Y = initialPos.Y - Body.GetCenter(graphics.GraphicsDevice).Y;
-
-//        double mass = bodies[1].Mass; // Jordens massa
-//        string name = "Planet" + bodies.Count.ToString();
-
-//        Planet spwnObject = new Planet(mass, name, initialPos, shootVector, planetSprite, bodies[0], graphics);
-//        Console.WriteLine("Planet added at: " + spwnObject.Position);
-//        bodies.Add(spwnObject);
-//        planets.Add(spwnObject);
-//        spriteCache.Add(spwnObject, new List<Vector2>());
-//    }
