@@ -37,6 +37,7 @@ namespace ProjectRevolution
             this.activeTexture = texture1;
         }
 
+        // Sekundär constructor för att skapa hastighetsknappar, lagrar vilken hastighet (0-3) knappen aktiverar.
         public Button(Vector2 position, int width, int height, int simulationSpeed, Texture2D buttonTexture,
     Texture2D toggleTexture = null)
         {
@@ -52,6 +53,8 @@ namespace ProjectRevolution
             this.activeTexture = texture1;
         }
 
+        // Ger upphov till att byta textur efter att knappen har tryckts.
+        // Om texture2 inte angivits byter inte knappen textur
         public void ToggleTexture()
         {
             if (texture2 != null)
@@ -67,7 +70,7 @@ namespace ProjectRevolution
             }
         }
 
-        // click for Pause behavior
+        // Klick-metod för hastighet
         public int CheckClick(MouseState mouse, bool mouseHold, int currentSimulationSpeed)
         {
             if (!mouseHold && Game1.IsMouseInArea(mouse, buttonArea.Location, buttonArea.Height, buttonArea.Width))
@@ -80,7 +83,7 @@ namespace ProjectRevolution
             }
         }
 
-        //Zoom button behavior
+        // Klick-metod för zoom
         public bool CheckClickZoom(MouseState mouse, bool mouseHold, bool isZoomedOut , double referenceDistanceInUnits, List<Planet> planets, GraphicsDeviceManager graphicsDeviceManager)
         {
             //Kollar om mus är i arean av knappen

@@ -68,7 +68,7 @@ namespace ProjectRevolution
         }
 
         // Kollar om en Vector2-position är inom det specifierade gradintervallet.
-        // OBS: fungerar endast upp till 179 grader!!!! TODO: fixa det
+        // OBS: fungerar endast upp till 179 grader!!!!
         private bool isPositionOutOfBounds(Vector2 position, int iteration)
         {
             // Om ingen fadeDegree angetts tas svansen aldrig bort.

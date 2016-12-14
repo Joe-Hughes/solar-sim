@@ -18,6 +18,7 @@ namespace ProjectRevolution
         private TextBox txtBoxVel;
         private TextBox txtBoxAcc;
 
+        // 'text box description", texten som är före den riktiga textboxen
         private TextBox txtBoxDesName;
         private TextBox txtBoxDesDis;
         private TextBox txtBoxDesVel;

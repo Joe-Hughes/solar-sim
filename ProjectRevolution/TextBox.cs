@@ -16,6 +16,7 @@ namespace ProjectRevolution
         protected string text;
         protected SpriteFont font;
         protected Rectangle hitbox;
+        // True om det går att mata in ett eget värde i textfältet
         protected bool edit;
 
         public bool Selected { get { return selected; } set { selected = value; } }
