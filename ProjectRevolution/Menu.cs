@@ -152,8 +152,8 @@ namespace ProjectRevolution
 
                 txtBoxDis.Text = Math.Round((Body.DetermineDistance(planet, sun) * planet.ScaleMultiplier * 6.68469 * Math.Pow(10, -12)), 3).ToString() + " AU";
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString() + " m/s";
-                txtBoxAcc.Text = Math.Round(planet.Acceleration * 1000, 5).ToString() + " mm/s^2";
-                txtBoxCentriAcc.Text = Math.Round((Math.Pow(planet.Acceleration * 1000, 4) / Body.DetermineDistance(planet, sun))).ToString() + " mm/s^2";
+                txtBoxAcc.Text = planet.Acceleration * 1000 + " mm/s^2";
+                txtBoxCentriAcc.Text = (Math.Pow(planet.Acceleration * 1000, 2) / Body.DetermineDistance(planet, sun)).ToString() + " mm/s^2";
                 
             }
             else

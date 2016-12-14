@@ -76,7 +76,8 @@ namespace ProjectRevolution
         KbHandler kbHandler = new KbHandler();
         bool takeKeyboardInput = false;
 
-        double oldTotalUpdateTime = 0;
+        double oldTotalUpdateTimeSec = 0;
+        double oldTotalUpdateTimeMilli = 0;
         double oldTotalDrawTime = 0;
 
         // Programvariabler
@@ -243,7 +244,7 @@ namespace ProjectRevolution
         {
             Body.UpdateTimeSpeed(simulationSpeed);
 
-            if (IrlTotalUpdateTime(gameTime) >= (1 / preferedUPS))
+            if (IrlTotalUpdateTimeSec(gameTime) >= (1 / preferedUPS))
             {
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
@@ -338,7 +339,7 @@ namespace ProjectRevolution
                         // Om det inte skett en kollision, uppdatera planeternas positioner igen.
                         if (!collisionDetected)
                         {
-                            planet.UpdateVelocityAndPosition(bodies, IrlTotalUpdateTime(gameTime));
+                            planet.UpdateVelocityAndPosition(bodies, IrlTotalUpdateTimeSec(gameTime), IrlTotalUpdateTimeMilli(gameTime));
                             planet.Tail.AddTailPosition(planet);
                         }
                     }
@@ -350,7 +351,8 @@ namespace ProjectRevolution
                 }
 
                 base.Update(gameTime);
-                oldTotalUpdateTime = gameTime.TotalGameTime.TotalSeconds;
+                oldTotalUpdateTimeSec = gameTime.TotalGameTime.TotalSeconds;
+                oldTotalUpdateTimeMilli = gameTime.TotalGameTime.TotalMilliseconds;
             }
         }
 
@@ -390,7 +392,7 @@ namespace ProjectRevolution
                         }
                     }
 
-                    spriteBatch.Draw(body.Texture, body.SpritePosition);
+                    spriteBatch.Draw(body.Texture, body.Position);
                     
                     // Ritar markören om kroppen är markerad
                     if (body == selectedBody)
@@ -413,8 +415,8 @@ namespace ProjectRevolution
 
                 // Ritar debugmätarna för FPS och UPS
                 spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
-                //if (IrlTotalUpdateTime(gameTime) != 0)    //Temporary
-                //    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / IrlTotalUpdateTime(gameTime)), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
+                //if (IrlTotalUpdateTimeSec(gameTime) != 0)    //Temporary
+                //    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / IrlTotalUpdateTimeSec(gameTime)), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
 
                 //If it's selected the planets info gets drawn ontop of the menu's background sprite
                 if (wait >= 5)
@@ -474,9 +476,14 @@ namespace ProjectRevolution
             return center;
         }
 
-        public double IrlTotalUpdateTime(GameTime gametime)
+        public double IrlTotalUpdateTimeSec(GameTime gametime)
         {
-            return gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTime;
+            return gametime.TotalGameTime.TotalSeconds - oldTotalUpdateTimeSec;
+        }
+
+        public double IrlTotalUpdateTimeMilli(GameTime gametime)
+        {
+            return gametime.TotalGameTime.TotalMilliseconds - oldTotalUpdateTimeMilli;
         }
 
         public double IrlTotalDrawTime(GameTime gametime)

@@ -83,7 +83,7 @@ namespace ProjectRevolution
 
         // Beräknar den resulterande vektorn av alla andra kroppars krafter på planeten och flytter den till en viss position
 
-        public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate)
+        public void UpdateVelocityAndPosition(List<Body> bodies, double totalSecondsSinceUpdate, double oldTotalUpdateTimeMilli)
         {
             Vector2 velocityVector = new Vector2();
 
@@ -124,7 +124,7 @@ namespace ProjectRevolution
             this.spritePosition = Vector2.Subtract(position, new Vector2(radius));
 
             speed = velocity.Length() * scaleMultiplier;
-            acceleration = (speed - oldSpeed) / (totalSecondsSinceUpdate * timeSpeed);
+            acceleration = (speed - oldSpeed) / (oldTotalUpdateTimeMilli / 1000 * timeSpeed);
             oldSpeed = speed;
         }
 
