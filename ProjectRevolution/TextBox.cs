@@ -19,7 +19,8 @@ namespace ProjectRevolution
         protected bool edit;
 
         public bool Selected { get { return selected; } set { selected = value; } }
-        public string Text {
+        public string Text
+        {
             get { return text; }
             set
             {

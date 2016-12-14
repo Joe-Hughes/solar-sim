@@ -123,8 +123,8 @@ namespace ProjectRevolution
             this.position.Y += velocity.Y * Convert.ToSingle(totalSecondsSinceUpdate * timeSpeed);
             this.spritePosition = Vector2.Subtract(position, new Vector2(radius));
 
-            speed = Math.Sqrt(Math.Pow(velocity.X * scaleMultiplier, 2) + Math.Pow(velocity.Y * scaleMultiplier, 2));
-            acceleration = (speed - oldSpeed) / totalSecondsSinceUpdate * timeSpeed;
+            speed = velocity.Length() * scaleMultiplier;
+            acceleration = (speed - oldSpeed) / (totalSecondsSinceUpdate * timeSpeed);
             oldSpeed = speed;
         }
 

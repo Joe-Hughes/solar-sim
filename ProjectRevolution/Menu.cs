@@ -11,18 +11,25 @@ namespace ProjectRevolution
 {
     class Menu
     {
-        private List<TextBox> txtBoxes;
+        private List<TextBox> planetTxtBoxes;
+        private List<TextBox> timeTxtBoxes;
 
         private TextBox txtBoxName;
         private TextBox txtBoxDis;
         private TextBox txtBoxVel;
         private TextBox txtBoxAcc;
+        private TextBox txtBoxCentriAcc;
+        private TextBox txtBoxRealTime;
+        private TextBox txtBoxSimTime;
 
         private TextBox txtBoxDesName;
         private TextBox txtBoxDesDis;
         private TextBox txtBoxDesVel;
         private TextBox txtBoxDesAcc;
-        private TextBox txtBoxCentriAcc;
+        private TextBox txtBoxDesCentriAcc;
+        private TextBox txtBoxDesRealTime;
+        private TextBox txtBoxDesSimTime;
+
 
         private TextBox selected;
 
@@ -31,21 +38,27 @@ namespace ProjectRevolution
         private Body body;
         private Body sun;
         private SpriteFont font;
-        private TimeSpan realTimeElapsed;
         private TimeSpan simulationTimeElapsed;
+        private TimeSpan oldTimeElapsed;
 
-        public List<TextBox> TxtBoxes { get { return txtBoxes; } }
+        public List<TextBox> TxtBoxes { get { return planetTxtBoxes; } }
 
         public TextBox TxtBoxName { get { return txtBoxName; } set { txtBoxName = value; } }
         public TextBox TxtBoxDis { get { return txtBoxDis; } set { txtBoxDis = value; } }
         public TextBox TxtBoxVel { get { return txtBoxVel; } set { txtBoxVel = value; } }
         public TextBox TxtBoxAcc { get { return txtBoxAcc; } set { txtBoxAcc = value; } }
-        
+        public TextBox TxtBoxCentriAcc { get { return txtBoxCentriAcc; } set { txtBoxCentriAcc = value; } }
+        public TextBox TxtBoxRealTime { get { return txtBoxDesRealTime; } set { txtBoxDesRealTime = value; } }
+        public TextBox TxtBoxSimTime { get { return txtBoxSimTime; } set { txtBoxSimTime = value; } }
+
         public TextBox TxtBoxDesName { get { return txtBoxDesName; } set { txtBoxDesName = value; } }
         public TextBox TxtBoxDesDis { get { return txtBoxDesDis; } set { txtBoxDesDis = value; } }
         public TextBox TxtBoxDesVel { get { return txtBoxDesVel; } set { txtBoxDesVel = value; } }
         public TextBox TxtBoxDesAcc { get { return txtBoxDesAcc; } set { txtBoxDesAcc = value; } }
-        public TextBox TxtTBoxCentriAcc { get { return txtBoxCentriAcc; } set { txtBoxCentriAcc = value; } }
+        public TextBox TxtBoxDesCentriAcc { get { return txtBoxDesCentriAcc; } set { txtBoxDesCentriAcc = value; } }
+        public TextBox TxtBoxDesRealTime { get { return txtBoxDesRealTime; } set { txtBoxDesRealTime = value; } }
+        public TextBox TxtBoxDesSimTime { get { return txtBoxDesSimTime; } set { txtBoxDesSimTime = value; } }
+
 
         public TextBox Selected { get { return selected; } set { selected = value; } }
         public Body Body { get { return body; } set { this.body = value; } }
@@ -63,27 +76,39 @@ namespace ProjectRevolution
             this.txtBoxDesDis = new TextBox("Distans till solen: ", new Point(horizontalTextPosition, 70), font, false);
             this.txtBoxDesVel = new TextBox("Hastighet: ", new Point(horizontalTextPosition, 110), font, false);
             this.txtBoxDesAcc = new TextBox("Acceleration: ", new Point(horizontalTextPosition, 150), font, false);
+            this.txtBoxDesCentriAcc = new TextBox("Centripetal Acceleration: ", new Point(horizontalTextPosition, 190), font, false);
+            this.txtBoxDesRealTime = new TextBox("Passerad verklig tid: ", new Point(horizontalTextPosition, 580), font, false);
+            this.txtBoxDesSimTime = new TextBox("Passerad simulationstid: ", new Point(horizontalTextPosition, 620), font, false);
 
             this.txtBoxName = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesName.Text).X), 10), font, false);
             this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesDis.Text).X), 70), font, false);
             this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesVel.Text).X), 110), font, true);
             this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesAcc.Text).X), 150), font, false);
-            this.txtBoxCentriAcc = new TextBox("", new Point(horizontalTextPosition, 190), font, true); // TODO CHANGE THIS
+            this.txtBoxCentriAcc = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesCentriAcc.Text).X), 190), font, false); // TODO CHANGE THIS
+            this.txtBoxRealTime = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesRealTime.Text).X), 580), font, false);
+            this.txtBoxSimTime = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesSimTime.Text).X), 620), font, false);
 
-            this.txtBoxes = new List<TextBox>
+            this.planetTxtBoxes = new List<TextBox>
             {
                 this.txtBoxName,
                 this.txtBoxDis,
                 this.txtBoxVel,
                 this.txtBoxAcc,
+                this.txtBoxCentriAcc,
                 this.txtBoxDesName,
                 this.txtBoxDesDis,
                 this.txtBoxDesVel,
-                this.txtBoxDesAcc
+                this.txtBoxDesAcc,
+                this.txtBoxDesCentriAcc
             };
-            
-            realTimeElapsed = timeElapsed;
-            simulationTimeElapsed = TimeSpan.FromMilliseconds(realTimeElapsed.TotalMilliseconds * sun.TimeSpeed);
+
+            this.timeTxtBoxes = new List<TextBox>
+            {
+                this.txtBoxRealTime,
+                this.txtBoxDesRealTime,
+                this.txtBoxSimTime,
+                this.txtBoxDesSimTime
+            };
         }
 
         public void DrawStrings(SpriteBatch spriteBatch, Body body)
@@ -98,11 +123,16 @@ namespace ProjectRevolution
 
                 else
                 {
-                    foreach (TextBox txtBox in txtBoxes)
+                    foreach (TextBox txtBox in planetTxtBoxes)
                     {
                         spriteBatch.DrawString(font, txtBox.Text, txtBox.Hitbox.Location.ToVector2(), Color.Black);
                     }
                 }
+            }
+
+            foreach (TextBox txtBox in timeTxtBoxes)
+            {
+                spriteBatch.DrawString(font, txtBox.Text, txtBox.Hitbox.Location.ToVector2(), Color.Black);
             }
         }
 
@@ -117,16 +147,27 @@ namespace ProjectRevolution
                 txtBoxDesDis.Text = "Distans till solen: ";
                 txtBoxDesVel.Text = "Hastighet: ";
                 txtBoxDesAcc.Text = "Acceleration: ";
+                txtBoxDesRealTime.Text = "Passerad verklig tid: ";
+                txtBoxDesSimTime.Text = "Passerad simulationstid: ";
 
                 txtBoxDis.Text = Math.Round((Body.DetermineDistance(planet, sun) * planet.ScaleMultiplier * 6.68469 * Math.Pow(10, -12)), 3).ToString() + " AU";
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString() + " m/s";
-                txtBoxAcc.Text = Math.Round(planet.Acceleration).ToString() + " m/s^2";
-                txtBoxCentriAcc.Text = (Math.Pow(planet.Acceleration, 2) / Body.DetermineDistance(planet, sun)).ToString() + " m/s^2";
+                txtBoxAcc.Text = Math.Round(planet.Acceleration * 1000, 5).ToString() + " mm/s^2";
+                txtBoxCentriAcc.Text = Math.Round((Math.Pow(planet.Acceleration * 1000, 4) / Body.DetermineDistance(planet, sun))).ToString() + " mm/s^2";
+                
             }
             else
             {
                 txtBoxName.Text = body.Name;
             }
+        }
+
+        public void UpdateTimeValues(TimeSpan realTimeElapsed)
+        {
+            txtBoxRealTime.Text = realTimeElapsed.Minutes.ToString() + " min, " + realTimeElapsed.Seconds.ToString() + " sek";
+            simulationTimeElapsed = simulationTimeElapsed.Add(TimeSpan.FromMilliseconds(realTimeElapsed.Subtract(oldTimeElapsed).TotalMilliseconds * Body.timeSpeed));
+            txtBoxSimTime.Text = Math.Round(simulationTimeElapsed.TotalDays / 365.25, 1).ToString() + " y";
+            oldTimeElapsed = realTimeElapsed;
         }
 
         public void PushChanges()

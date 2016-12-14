@@ -68,10 +68,14 @@ namespace ProjectRevolution
         }
 
         // click for Pause behavior
-        public int CheckClick(MouseState mouse, bool mouseHold, int currentSimulationSpeed)
+        public int CheckClick(MouseState mouse, bool mouseHold, int currentSimulationSpeed, Menu menu)
         {
             if (!mouseHold && Game1.IsMouseInArea(mouse, buttonArea.Location, buttonArea.Height, buttonArea.Width))
             {
+                if(menu.Selected != null)
+                {
+                    menu.PushChanges();
+                }
                 return this.simulationSpeed;
             }
             else

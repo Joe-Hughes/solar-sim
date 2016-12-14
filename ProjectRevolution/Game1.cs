@@ -261,10 +261,10 @@ namespace ProjectRevolution
                     isZoomedOut = zoomButton.CheckClickZoom(mouse, mouseHold, isZoomedOut, referenceDistanceInUnits, planets, graphics);
 
                     // Kollar om man tryckt på någon av tidsknapparna och byter i så fall hastighet
-                    simulationSpeed = pauseButton.CheckClick(mouse, mouseHold, simulationSpeed);
-                    simulationSpeed = playButton.CheckClick(mouse, mouseHold, simulationSpeed);
-                    simulationSpeed = playButton2.CheckClick(mouse, mouseHold, simulationSpeed);
-                    simulationSpeed = playButton3.CheckClick(mouse, mouseHold, simulationSpeed);
+                    simulationSpeed = pauseButton.CheckClick(mouse, mouseHold, simulationSpeed, menu);
+                    simulationSpeed = playButton.CheckClick(mouse, mouseHold, simulationSpeed, menu);
+                    simulationSpeed = playButton2.CheckClick(mouse, mouseHold, simulationSpeed, menu);
+                    simulationSpeed = playButton3.CheckClick(mouse, mouseHold, simulationSpeed, menu);
                     if (simulationSpeed > 0 && physicsBroken && !promtedAboutCollision)
                     {
                         promtedAboutCollision = true;
@@ -295,6 +295,15 @@ namespace ProjectRevolution
                         {
                             selectedBody = body;
                             menu.Body = body;
+                            break;
+                        }
+                        else
+                        {
+                            if (mouse.Position.X < menuBackground.X)
+                            {
+                                selectedBody = null;
+                                menu.Body = null;
+                            }
                         }
                     }
                     mouseHold = true;
@@ -418,6 +427,7 @@ namespace ProjectRevolution
                             menu.UpdateValues();
                         }
                     }
+                    menu.UpdateTimeValues(realTimeElapsed);
                 }
                 else
                 {
