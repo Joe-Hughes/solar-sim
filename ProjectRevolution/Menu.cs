@@ -77,7 +77,7 @@ namespace ProjectRevolution
             this.txtBoxDesDis = new TextBox("Distans till solen: ", new Point(horizontalTextPosition, 70), font, false);
             this.txtBoxDesVel = new TextBox("Hastighet: ", new Point(horizontalTextPosition, 110), font, false);
             this.txtBoxDesAcc = new TextBox("Acceleration: ", new Point(horizontalTextPosition, 150), font, false);
-            this.txtBoxDesCentriAcc = new TextBox("Centripetal Acceleration: ", new Point(horizontalTextPosition, 190), font, false);
+            this.txtBoxDesCentriAcc = new TextBox("Tangentiell centripetalacceleration: ", new Point(horizontalTextPosition, 190), font, false);
             this.txtBoxDesRealTime = new TextBox("Passerad verklig tid: ", new Point(horizontalTextPosition, 580), font, false);
             this.txtBoxDesSimTime = new TextBox("Passerad simulationstid: ", new Point(horizontalTextPosition, 620), font, false);
 
@@ -85,7 +85,7 @@ namespace ProjectRevolution
             this.txtBoxDis = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesDis.Text).X), 70), font, false);
             this.txtBoxVel = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesVel.Text).X), 110), font, true);
             this.txtBoxAcc = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesAcc.Text).X), 150), font, false);
-            this.txtBoxCentriAcc = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesCentriAcc.Text).X), 190), font, false); // TODO CHANGE THIS
+            this.txtBoxCentriAcc = new TextBox("", new Point(horizontalTextPosition, 210), font, false);
             this.txtBoxRealTime = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesRealTime.Text).X), 580), font, false);
             this.txtBoxSimTime = new TextBox("", new Point(horizontalTextPosition + Convert.ToInt32(font.MeasureString(txtBoxDesSimTime.Text).X), 620), font, false);
 
@@ -147,8 +147,11 @@ namespace ProjectRevolution
 
                 txtBoxDis.Text = Math.Round((Body.DetermineDistance(planet, sun) * planet.ScaleMultiplier * 6.68469 * Math.Pow(10, -12)), 3).ToString() + " AU";
                 txtBoxVel.Text = Math.Round(planet.Speed).ToString() + " m/s";
-                txtBoxAcc.Text = Math.Round(planet.Acceleration, 10) * 1000 + " mm/s^2";
-                txtBoxCentriAcc.Text = Math.Round((Math.Pow(planet.Acceleration * 1000, 2) / Body.DetermineDistance(planet, sun)), 10) + " mm/s^2";
+                if (planet.Acceleration != 0)
+                {
+                    txtBoxAcc.Text = Math.Round(planet.Acceleration * 1000, 5) + " mm/s^2";
+                    txtBoxCentriAcc.Text = Math.Round((Math.Pow(planet.Speed, 2) / Body.DetermineDistance(planet, sun))) + " m/s^2";
+                }
                 
             }
             else

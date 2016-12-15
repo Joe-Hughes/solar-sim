@@ -302,23 +302,23 @@ namespace ProjectRevolution
                                 }
                             }
                         }
-                    }
 
-                    // Markerar kroppar som användaren trycker på
-                    foreach (Body body in bodies)
-                    {
-                        if (IsMouseInArea(mouse, body.SpritePosition.ToPoint(), body.radius * 2, body.radius * 2))
+                        // Markerar kroppar som användaren trycker på
+                        foreach (Body body in bodies)
                         {
-                            selectedBody = body;
-                            menu.Body = body;
-                            break;
-                        }
-                        else
-                        {
-                            if (mouse.Position.X < menuBackground.X)
+                            if (IsMouseInArea(mouse, body.SpritePosition.ToPoint(), body.radius * 2, body.radius * 2))
                             {
-                                selectedBody = null;
-                                menu.Body = null;
+                                selectedBody = body;
+                                menu.Body = body;
+                                break;
+                            }
+                            else
+                            {
+                                if (mouse.Position.X < menuBackground.X)
+                                {
+                                    selectedBody = null;
+                                    menu.Body = null;
+                                }
                             }
                         }
                     }
@@ -432,7 +432,7 @@ namespace ProjectRevolution
                 spriteBatch.Draw(zoomButton.Texture, zoomButton.Location.ToVector2());
 
                 // Ritar debugmätarna för FPS och UPS
-                spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
+                //spriteBatch.DrawString(arial, "FPS:" + Convert.ToInt32(1 / IrlTotalDrawTime(gameTime)), new Vector2(0, 0), new Color(new Vector3(233, 0, 0)));
                 //if (IrlTotalUpdateTimeSec(gameTime) != 0)    //Temporary
                 //    spriteBatch.DrawString(arial, "UPS:" + Convert.ToInt32(1 / IrlTotalUpdateTimeSec(gameTime)), new Vector2(0, 13), new Color(new Vector3(233, 0, 0)));
 
